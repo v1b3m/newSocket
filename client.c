@@ -56,9 +56,10 @@ int main(int argc, char *argv[])
   if(connect(sockfd,(struct sockaddr *) &serv_addr, sizeof(serv_addr))< 0)
     error("Connection to server failed");
 
-  printf("Client: ");
+
   while(1)
   {
+    printf("Client: ");
     bzero(buffer,255);
     fgets(buffer,255,stdin);
     n = write(sockfd,buffer,strlen(buffer));
@@ -70,10 +71,10 @@ int main(int argc, char *argv[])
     if (n < 0)
       error("ERROR reading from socket");
     printf("Server : %s\n",buffer);
-
-    int i = strncmp("Bye",buffer, 3);
-    if(i == 0)
-      break;
+    //
+    // int i = strncmp("Bye",buffer, 3);
+    // if(i == 0)
+    //   break;
   }
   close(sockfd);
   return 0;
