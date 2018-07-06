@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,6 +19,7 @@ void error(const char *msg)
 void reverse(char s[]);
 void dbl(char s[]);
 void del(char word[],int i);
+char *trimwhitespace(char *str);
 
 
 //int argc is the total number of parameters we'll be passing
@@ -63,15 +65,14 @@ int main(int argc, char *argv[])
   while(1)
   {
     FILE * fp;
-    fp = fopen("log.txt","w");
-    fprintf(fp,"We're up");
+    fp = fopen("ready_jobs.txt","a");
     char message[255];
     char* word;
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
-    tm.tm_min, tm.tm_sec);
+    // printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+    // tm.tm_hour,tm.tm_min, tm.tm_sec);
 
     bzero(buffer, 255);
     n = read(newsockfd, buffer, 255);
@@ -86,25 +87,46 @@ int main(int argc, char *argv[])
     int a;
     if(strncmp("rev",message,3) == 0)
     {
-        clock_t begin = clock();
-        word = strtok(NULL," ");
-        reverse(word);
+      clock_t begin = clock();
+      word = strtok(NULL," ");
+      int i, j, temp;
+      int l = strlen(word);
+
+
+        for (i = 0, j = l - 1; i < j; i++, j--) {
+        temp = word[i];
+        word[i] = word[j];
+        word[j] = temp;
+        }
+        word = trimwhitespace(word);
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        printf("%f\n",time_spent );
         n = write(newsockfd, word ,strlen(word));
-        if (n < 0 )
+
+        if (n < 0 ) {
     			error("Error on writing");
-        bzero(word,sizeof(word));
+        } else {
+          fprintf(fp,"rev,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          bzero(word,sizeof(word));
+        }
+
     } else if (strncmp("dbl",message,3) == 0)
     {
       clock_t begin = clock();
       word = strtok(NULL," ");
       dbl(word);
       clock_t end = clock();
-      write(newsockfd, word ,strlen(word));
+      n = write(newsockfd, word ,strlen(word));
+
+      if (n < 0 ) {
+        error("Error on writing");
+      } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+      fprintf(fp,"dbl,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       bzero(word,sizeof(word));
+    }
     } else if (strncmp("del",message,3) == 0)
     {
       clock_t begin = clock();
@@ -120,7 +142,6 @@ int main(int argc, char *argv[])
       int n = strlen(numbers);
 
       num[0] = atoi(strtok(numbers,","));
-      printf("%d\n",num[0] );
 
       for(int i=1;i<(n/2);i++) {
         num[i] = atoi(strtok(NULL,","));
@@ -148,9 +169,16 @@ int main(int argc, char *argv[])
       }
     }
     clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
-      write(newsockfd, word ,sizeof(word));
+
+    n = write(newsockfd, word ,sizeof(word));
+    if (n < 0 ) {
+      error("Error on writing");
+    } else {
+      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+      fprintf(fp,"del,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+    }
     } else if (strncmp("rep",message,3) == 0)
     {
       char word[50];
@@ -168,7 +196,7 @@ int main(int argc, char *argv[])
       strcpy(letter,strtok(NULL,"-"));
 
       char* p = word;
-      p[index] = letter;
+      // p[index] = letter;
 
       //replace the character
 
@@ -185,44 +213,47 @@ int main(int argc, char *argv[])
     break;
     fclose(fp);
   }
-  
+  //close the send socket-this frees up memory
   close(newsockfd);
+  //close the connection socket
   close(sockfd);
   return 0;
 
-  }
 
-  void reverse(char s[])
-  {
-      void reverser(char s[],int i,int len);
+}
 
-      reverser(s,0,strlen(s));
-  }
 
-  /* reverser: reverse string s in place; recursive */
 
-  void reverser(char s[],int i,int len)
-  {
-      int c,j;
-
-      j = len - (i + 1);
-
-      if( i < j )
-      {
-          c = s[i];
-          s[i] = s[j];
-          s[j] = c;
-
-          reverser(s,++i,len);
-      }
-  }
-
+//this is the method to double the strings
 void dbl(char s[]) {
   char* a;
   strcpy(a,s);
-  strcat(s,a);
+  trimwhitespace(a);
+  trimwhitespace(s);
+  trimwhitespace(strcat(s,a));
 }
 
+//this is the method to delete characters from strings
 void del(char word[],int i) {
     memmove(&word[i], &word[i + 1], strlen(word) - i);
+}
+
+char *trimwhitespace(char *str)
+{
+  char *end;
+
+  // Trim leading space
+  while(isspace((unsigned char)*str)) str++;
+
+  if(*str == 0)  // All spaces?
+    return str;
+
+  // Trim trailing space
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
+
+  // Write new null terminator character
+  end[1] = '\0';
+
+  return str;
 }
