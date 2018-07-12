@@ -16,6 +16,8 @@ argv[2] portno
 #include <netinet/in.h>
 #include <netdb.h>
 
+char *trimwhitespace(char *str);
+
 void error(const char *msg)
 {
   perror(msg);
@@ -60,8 +62,9 @@ int main(int argc, char *argv[])
   while(1)
   {
     char Id[10];
-    printf("Username:");
-    scanf("%s\n",Id);
+    strcpy(Id,argv[4]);
+    // printf("Username:");
+    // scanf("%s\n",Id);
     printf("Client: ");
     bzero(buffer,255);
     fgets(buffer,255,stdin);
@@ -81,4 +84,24 @@ int main(int argc, char *argv[])
   }
   close(sockfd);
   return 0;
+}
+
+char *trimwhitespace(char *str)
+{
+  char *end;
+
+  // Trim leading space
+  while(isspace((unsigned char)*str)) str++;
+
+  if(*str == 0)  // All spaces?
+    return str;
+
+  // Trim trailing space
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
+
+  // Write new null terminator character
+  end[1] = '\0';
+
+  return str;
 }
