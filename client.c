@@ -15,6 +15,7 @@ argv[2] portno
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <ctype.h>
 
 char *trimwhitespace(char *str);
 
@@ -76,7 +77,7 @@ int main(int argc, char *argv[])
     n = read(sockfd,buffer,255);
     if (n < 0)
       error("ERROR reading from socket");
-    printf("Server : %s\n",buffer);
+    printf("Server: %s\n",buffer);
     //
     // int i = strncmp("Bye",buffer, 3);
     // if(i == 0)

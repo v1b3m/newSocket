@@ -65,13 +65,13 @@ int main(int argc, char *argv[])
   if(newsockfd < 0)
     error("Error on accept");
 
-
+  char word[256];
   while(1)
   {
     FILE * fp;
     fp = fopen("ready_jobs.txt","a");
     char message[255];
-    char* word;
+    char* word1;
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -85,62 +85,64 @@ int main(int argc, char *argv[])
 
     printf("Client: %s\n",buffer);
     strcpy(message,buffer);
-    word = strtok(message," ");
+    word1 = strtok(message," ");
 
     //reversing the function
     int a;
     if(strncmp("rev",message,3) == 0)
     {
       clock_t begin = clock();
-      word = strtok(NULL," ");
+      word1 = strtok(NULL," ");
       int i, j, temp;
-      int l = strlen(word);
+      int l = strlen(word1);
 
 
         for (i = 0, j = l - 1; i < j; i++, j--) {
-        temp = word[i];
-        word[i] = word[j];
-        word[j] = temp;
+        temp = word1[i];
+        word1[i] = word1[j];
+        word1[j] = temp;
         }
-        word = trimwhitespace(word);
+        word1 = trimwhitespace(word1);
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        n = write(newsockfd, word ,strlen(word));
+        strcpy(word,word1);
+        // n = write(newsockfd, word ,strlen(word));
 
-        if (n < 0 ) {
-    			error("Error on writing");
-        } else {
+        // if (n < 0 ) {
+    		// 	error("Error on writing");
+        // } else {
           fprintf(fp,"rev,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          bzero(word,sizeof(word));
-        }
+          // bzero(word,sizeof(word));
+        // }
 
     } else if (strncmp("dbl",message,3) == 0)
     {
       clock_t begin = clock();
-      word = strtok(NULL," ");
-      dbl(word);
+      word1 = strtok(NULL," ");
+      dbl(word1);
       clock_t end = clock();
-      n = write(newsockfd, word ,strlen(word));
+      strcpy(word,word1);
+      // n = write(newsockfd, word ,strlen(word));
 
-      if (n < 0 ) {
-        error("Error on writing");
-      } else {
+      // if (n < 0 ) {
+      //   error("Error on writing");
+      // } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       fprintf(fp,"dbl,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      bzero(word,sizeof(word));
-    }
+      // bzero(word,sizeof(word));
+    // }
     } else if (strncmp("del",message,3) == 0)
     {
       clock_t begin = clock();
-      char word[50];
+      // char word[50];
       char numbers[20];
 
       //initialize array to hold the indexes to be deleted
       int num[10]={0};
 
-      strcpy(word,strtok(NULL," "));
+      word1 = strtok(NULL," ");
       strcpy(numbers,strtok(NULL," "));
 
       int n = strlen(numbers);
@@ -168,65 +170,91 @@ int main(int argc, char *argv[])
     int j=1;
     for(int i=0;i<10;i++){
       if(num[i] != 0) {
-        del(word,num[i]-j);
+        del(word1,num[i]-j);
         j++;
       }
     }
     clock_t end = clock();
+    strcpy(word,word1);
 
 
-    n = write(newsockfd, word ,sizeof(word));
-    if (n < 0 ) {
-      error("Error on writing");
-    } else {
+    // n = write(newsockfd, word ,sizeof(word));
+    // if (n < 0 ) {
+    //   error("Error on writing");
+    // } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       fprintf(fp,"del,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-    }
+    // }
     } else if (strncmp("rep",message,3) == 0)
     {
-      char word[50];
+      char word2[50];
+      char *p;
+      p = word2;
       char replacements[50];
       int index;
-      char letter[1];
+      char letter[2];
+      letter[1] = '\0';
 
-      strcpy(word,strtok(NULL," "));
+      strcpy(word2,strtok(NULL," "));
       strcpy(replacements,strtok(NULL," "));
+      printf("%s\n",replacements );
 
-      index = atoi(strtok(replacements,"-"));
+      char segment[4];
+      strcpy(segment,strtok(replacements,","));
+      int i = atoi(strtok(segment,"-"));
+      printf("%d\n",i );
       strcpy(letter,strtok(NULL,"-"));
+      printf("%s\n",letter );
+      // strcpy(word[i],letter);
 
-      char* p = word;
+      // while( strtok(NULL,",") != NULL ) {
+      //   strcpy(segment,strtok(NULL,","));
+      //   int i = atoi(strtok(word,"-"));
+      //   printf("%d\n",i );
+      //   char letter[2];
+      //   strcpy(letter,strtok(NULL,"-"));
+      //   printf("%s\n",letter );
+      // }
       // p[index] = letter;
 
       //replace the character
+      strcpy(word,word2);
 
-      write(newsockfd, p ,sizeof(p));
-      bzero(word, 50);
+      // write(newsockfd, word ,50);
+      // bzero(word, 50);
       bzero(replacements,50);
       bzero(letter,1);
     } else if (strncmp("encrypt",message,7) == 0) {
-      char word[256];
+      char word1[256];
       char key[256];
-      strcpy(word,strtok(NULL," "));
-      trimwhitespace(word);
-      int size = strlen(word);
-      strcpy(key,encrypt(word,size));
+      strcpy(word1,strtok(NULL," "));
+      trimwhitespace(word1);
+      int size = strlen(word1);
+      strcpy(key,encrypt(word1,size));
       trimwhitespace(key);
-      write(newsockfd, key ,256);
+      strcpy(word,key);
+      // write(newsockfd, key ,256);
       bzero(key,256);
-      bzero(word,256);
+      bzero(word1,256);
     } else if (strncmp("decrypt",message,7) == 0) {
-      char word[50];
+      char word1[50];
       char key[10];
-      strcpy(word,strtok(NULL," "));
-      trimwhitespace(word);
-      strcpy(key,decrypt(word));
-      trimwhitespace(key);
-      write(newsockfd, key ,256);
+      strcpy(word1,strtok(NULL," "));
+      trimwhitespace(word1);
+      strcpy(key,decrypt(word1));
+      strcpy(word,key);
+      // trimwhitespace(key);
+      // write(newsockfd, key ,256);
       bzero(key,10);
+    } else {
+      char* message = "Invalid command";
+      strcpy(word,message);
     }
 
+    trimwhitespace(word);
+    n = write(newsockfd, word ,strlen(word));
+    bzero(word,256);
     //reads bytes in a string into the buffer pointed to by the first parameter
     //    fgets(buffer , 255 ,stdin);
     int i = strncmp("Bye" , buffer , 3);
@@ -239,7 +267,6 @@ int main(int argc, char *argv[])
   //close the connection socket
   close(sockfd);
   return 0;
-
 
 }
 
@@ -518,7 +545,6 @@ char* encrypt(char * word,int size) {
   	}
   	return key;
   }
-
 
 void strrev(unsigned char *str)
   {
