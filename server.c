@@ -89,9 +89,11 @@ int main(int argc, char *argv[])
 
     //reversing the function
     int a;
+    srand(time(NULL));
     if(strncmp("rev",message,3) == 0)
     {
       clock_t begin = clock();
+      int userId = rand();
       word1 = strtok(NULL," ");
       int i, j, temp;
       int l = strlen(word1);
@@ -111,14 +113,15 @@ int main(int argc, char *argv[])
         // if (n < 0 ) {
     		// 	error("Error on writing");
         // } else {
-          fprintf(fp,"rev,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+          fprintf(fp,"%d,rev,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
           // bzero(word,sizeof(word));
         // }
 
-    } else if (strncmp("dbl",message,3) == 0)
+    } else if (strncmp("double",message,6) == 0)
     {
       clock_t begin = clock();
+      int userId = rand();
       word1 = strtok(NULL," ");
       dbl(word1);
       clock_t end = clock();
@@ -129,13 +132,14 @@ int main(int argc, char *argv[])
       //   error("Error on writing");
       // } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"dbl,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+      fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       // bzero(word,sizeof(word));
     // }
     } else if (strncmp("del",message,3) == 0)
     {
       clock_t begin = clock();
+      int userId = rand();
       // char word[50];
       char numbers[20];
 
@@ -183,11 +187,13 @@ int main(int argc, char *argv[])
     //   error("Error on writing");
     // } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"del,%f,%d-%d-%d %d:%d:%d\n", time_spent,tm.tm_year + 1900,
+      fprintf(fp,"%d,del,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
     // }
     } else if (strncmp("rep",message,3) == 0)
     {
+      clock_t begin = clock();
+      int userId = rand();
       char word2[50];
       char *p;
       p = word2;
@@ -219,6 +225,10 @@ int main(int argc, char *argv[])
       // p[index] = letter;
 
       //replace the character
+      clock_t end = clock();
+      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+      fprintf(fp,"%d,rep,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       strcpy(word,word2);
 
       // write(newsockfd, word ,50);
@@ -226,23 +236,35 @@ int main(int argc, char *argv[])
       bzero(replacements,50);
       bzero(letter,1);
     } else if (strncmp("encrypt",message,7) == 0) {
+      clock_t begin = clock();
+      int userId = rand();
       char word1[256];
       char key[256];
       strcpy(word1,strtok(NULL," "));
       trimwhitespace(word1);
       int size = strlen(word1);
       strcpy(key,encrypt(word1,size));
+      clock_t end = clock();
+      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+      fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       trimwhitespace(key);
       strcpy(word,key);
       // write(newsockfd, key ,256);
       bzero(key,256);
       bzero(word1,256);
     } else if (strncmp("decrypt",message,7) == 0) {
+      clock_t begin = clock();
+      int userId = rand();
       char word1[50];
       char key[10];
       strcpy(word1,strtok(NULL," "));
       trimwhitespace(word1);
       strcpy(key,decrypt(word1));
+      clock_t end = clock();
+      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+      fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       strcpy(word,key);
       // trimwhitespace(key);
       // write(newsockfd, key ,256);
