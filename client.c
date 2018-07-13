@@ -43,11 +43,15 @@ int main(int argc, char *argv[])
   if (sockfd < 0)
     error("ERROR opening socket");
 
+  puts("[-]Ensure you've paid social media tax before attempting a connection...");
+  puts("[+]Socket created successfully...");
+
   server = gethostbyname(argv[1]);
   if(server == NULL) {
     fprintf(stderr, "ERROR, no such host\n");
     exit(1);
   }
+  puts("[+]Attempting connection to server...");
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
@@ -57,8 +61,10 @@ int main(int argc, char *argv[])
 
   serv_addr.sin_port = htons(portno);
   if(connect(sockfd,(struct sockaddr *) &serv_addr, sizeof(serv_addr))< 0)
-    error("Connection to server failed");
+    error("[-]Connection to server failed");
 
+    puts("[+]Connected to server...");
+    puts("[+]Enter q to end the connection...");
 
   while(1)
   {
@@ -69,6 +75,11 @@ int main(int argc, char *argv[])
     printf("Client: ");
     bzero(buffer,255);
     fgets(buffer,255,stdin);
+
+    if (buffer[0] == 'q') {
+      close(sockfd);
+      return 0;
+    }
     n = write(sockfd,buffer,strlen(buffer));
     if(n < 0)
       error ("ERROR writing to socket");

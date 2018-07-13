@@ -10,6 +10,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <pthread.h>
+#include <arpa/inet.h>
+
+//the thread function
+void *connection_handler(void *);
 
 void error(const char *msg)
 {
@@ -34,15 +39,19 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  int sockfd, newsockfd, portno, n;
-  char buffer[255];
+  int client_sock, socket_desc, portno, n;
+  int *new_sock;
+
 
   struct sockaddr_in serv_addr, cli_addr;
   socklen_t clilen;
 
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0)
-    error("[-]ERROR opening socket");
+  socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+  if (socket_desc == -1)
+  {
+      printf("Could not create socket");
+  }
+  puts("[+]Socket created...");
 
   //clears everything in the specified field so that it is clear before we input any
   //data_to_send, here it clears the server address
@@ -54,34 +63,66 @@ int main(int argc, char *argv[])
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(portno);
 
-  if(bind(sockfd , (struct sockaddr *) &serv_addr ,sizeof(serv_addr) ))
-    error("Binding failed");
+  if(bind(socket_desc , (struct sockaddr *) &serv_addr ,sizeof(serv_addr) ) < 0)
+  {
+    //print the error message
+    perror("[-]Bind failed. Error");
+    return 1;
+  }
+  puts("[+]Binding completed successfully...");
 
-  listen(sockfd ,5);
+  listen(socket_desc ,5);
+  //Accept and incoming connection
+  puts("[+]Waiting for incoming connections...");
   clilen = sizeof(cli_addr);
 
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
-  if(newsockfd < 0)
-    error("Error on accept");
-
-  char word[256];
-  while(1)
+  while((client_sock = accept(socket_desc, (struct sockaddr *) &cli_addr, &clilen)))
   {
-    FILE * fp;
+    puts("[+]Connection accepted...");
+
+    pthread_t sniffer_thread;
+    new_sock = malloc(sizeof *new_sock);
+    *new_sock = client_sock;
+
+    if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
+    {
+      printf("Failed");
+        perror("could not create thread");
+        return 1;
+    }
+
+    //Now join the thread , so that we dont terminate before the thread
+    pthread_join( sniffer_thread , NULL); // was commented before
+    puts("Handler assigned");
+  }
+  if (client_sock < 0)
+  {
+      perror("accept failed");
+      return 1;
+  }
+
+  return 0;
+
+}
+
+void *connection_handler(void *socket_desc)
+{
+  int sock = *(int*)socket_desc;
+  int read_size;
+  char buffer[256];
+  char word[256];
+  FILE * fp;
+  bzero(word,256);
+  bzero(buffer,256);
+
+  while((read_size = read(sock, buffer, 256)) > 0)
+  {
+
     fp = fopen("ready_jobs.txt","a");
-    char message[255];
+    char message[256];
     char* word1;
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-
-    // printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-    // tm.tm_hour,tm.tm_min, tm.tm_sec);
-
-    bzero(buffer, 255);
-    n = read(newsockfd, buffer, 255);
-    if(n < 0)
-      error("Error on reading.");
 
     printf("Client: %s\n",buffer);
     strcpy(message,buffer);
@@ -270,25 +311,33 @@ int main(int argc, char *argv[])
       // write(newsockfd, key ,256);
       bzero(key,10);
     } else {
-      char* message = "Invalid command";
+      char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
       strcpy(word,message);
     }
 
     trimwhitespace(word);
-    n = write(newsockfd, word ,strlen(word));
+    write(sock, word ,strlen(word));
     bzero(word,256);
-    //reads bytes in a string into the buffer pointed to by the first parameter
-    //    fgets(buffer , 255 ,stdin);
-    int i = strncmp("Bye" , buffer , 3);
-    if(i == 0)
-    break;
+    bzero(buffer,256);
     fclose(fp);
   }
-  //close the send socket-this frees up memory
-  close(newsockfd);
-  //close the connection socket
-  close(sockfd);
-  return 0;
+
+  if(read_size == 0)
+  {
+      puts("[-]Client disconnected");
+      fflush(stdout);
+  }
+  else if(read_size == -1)
+  {
+      perror("[-]recv failed");
+  }
+
+
+  //Free the socket pointer
+  free(socket_desc);
+
+  close(sock);
+  pthread_exit(NULL);
 
 }
 
