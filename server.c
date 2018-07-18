@@ -29,7 +29,7 @@ void strrev(unsigned char *str);
 int itoa(int num, unsigned char* str, int len, int base);
 char* encrypt(char * word,int size);
 char* decrypt(char * word);
-
+void strreplace(char s[], int i, char repl_chr);
 
 //int argc is the total number of parameters we'll be passing
 int main(int argc, char *argv[])
@@ -114,6 +114,7 @@ void *connection_handler(void *socket_desc)
   FILE * fp;
   bzero(word,256);
   bzero(buffer,256);
+  char error[100] = "Job too long, please enter something your height.";
 
   while((read_size = read(sock, buffer, 256)) > 0)
   {
@@ -133,9 +134,12 @@ void *connection_handler(void *socket_desc)
     srand(time(NULL));
     if(strncmp("rev",message,3) == 0)
     {
+      word1 = strtok(NULL," ");
+      if (strlen(word1) <= 50 )
+      {
       clock_t begin = clock();
       int userId = rand();
-      word1 = strtok(NULL," ");
+
       int i, j, temp;
       int l = strlen(word1);
 
@@ -149,36 +153,37 @@ void *connection_handler(void *socket_desc)
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
         strcpy(word,word1);
-        // n = write(newsockfd, word ,strlen(word));
 
-        // if (n < 0 ) {
-    		// 	error("Error on writing");
-        // } else {
           fprintf(fp,"%d,rev,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          // bzero(word,sizeof(word));
-        // }
+      } else {
+        strcpy(word,error);
+      }
 
     } else if (strncmp("double",message,6) == 0)
     {
+      char* job;
+      // strcpy(job,strtok(NULL," "));
       clock_t begin = clock();
       int userId = rand();
-      word1 = strtok(NULL," ");
-      dbl(word1);
+      job = strtok(NULL," ");
+      if(strlen(job) <= 50 ) {
+      dbl(job);
       clock_t end = clock();
-      strcpy(word,word1);
-      // n = write(newsockfd, word ,strlen(word));
+      strcpy(word,job);
 
-      // if (n < 0 ) {
-      //   error("Error on writing");
-      // } else {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      // bzero(word,sizeof(word));
-    // }
+    } else {
+      strcpy(word,error);
+    }
+
     } else if (strncmp("del",message,3) == 0)
     {
+      word1 = strtok(NULL," ");
+      if (strlen(word1) <= 50)
+      {
       clock_t begin = clock();
       int userId = rand();
       // char word[50];
@@ -187,7 +192,7 @@ void *connection_handler(void *socket_desc)
       //initialize array to hold the indexes to be deleted
       int num[10]={0};
 
-      word1 = strtok(NULL," ");
+
       strcpy(numbers,strtok(NULL," "));
 
       int n = strlen(numbers);
@@ -230,58 +235,69 @@ void *connection_handler(void *socket_desc)
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       fprintf(fp,"%d,del,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
       tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-    // }
+    } else {
+      strcpy(word,error);
+    }
+
     } else if (strncmp("rep",message,3) == 0)
     {
-      clock_t begin = clock();
-      int userId = rand();
       char word2[50];
-      char *p;
-      p = word2;
-      char replacements[50];
-      int index;
-      char letter[2];
-      letter[1] = '\0';
-
       strcpy(word2,strtok(NULL," "));
-      strcpy(replacements,strtok(NULL," "));
-      printf("%s\n",replacements );
+      if (strlen(word2) <= 50)
+      {
+        clock_t begin = clock();
+        int userId = rand();
+        int i=0;
+        char replacements[50];
+        strcpy(replacements,strtok(NULL," "));
+        // char *p = strtok(replacements,",");
+        char *array[10];
+        //
+        // while (p != NULL)
+        // {
+        //   array[i++] = p;
+        //   printf("%s\n",array[0] );
+        //
+        //   printf("%d",i);
+        //   i++;
+        //   p = strtok(NULL,",");
+        // }
+        if(strtok(replacements,",") == NULL)
+        {
+          int i = atoi(strtok(NULL,"-"));
+          char *r;
+          char *p = strtok(NULL,"-");
+          strreplace(word2, i, p);
+        } else {
 
-      char segment[4];
-      strcpy(segment,strtok(replacements,","));
-      int i = atoi(strtok(segment,"-"));
-      printf("%d\n",i );
-      strcpy(letter,strtok(NULL,"-"));
-      printf("%s\n",letter );
-      // strcpy(word[i],letter);
+        }
+        //
+        // for(i =0;i<10;i++)
+        //   printf("%s\n", array[i]);
 
-      // while( strtok(NULL,",") != NULL ) {
-      //   strcpy(segment,strtok(NULL,","));
-      //   int i = atoi(strtok(word,"-"));
-      //   printf("%d\n",i );
-      //   char letter[2];
-      //   strcpy(letter,strtok(NULL,"-"));
-      //   printf("%s\n",letter );
-      // }
-      // p[index] = letter;
-
-      //replace the character
-      clock_t end = clock();
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,rep,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      strcpy(word,word2);
+        clock_t end = clock();
+        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fprintf(fp,"%d,rep,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        strcpy(word,word2);
 
       // write(newsockfd, word ,50);
       // bzero(word, 50);
-      bzero(replacements,50);
-      bzero(letter,1);
+      // bzero(replacements,50);
+      // bzero(letter,1);
+    } else {
+      strcpy(word,error);
+    }
     } else if (strncmp("encrypt",message,7) == 0) {
+      char word1[256];
+      strcpy(word1,strtok(NULL," "));
+      if (strlen(word1) <= 50)
+      {
       clock_t begin = clock();
       int userId = rand();
-      char word1[256];
+
       char key[256];
-      strcpy(word1,strtok(NULL," "));
+
       trimwhitespace(word1);
       int size = strlen(word1);
       strcpy(key,encrypt(word1,size));
@@ -294,22 +310,28 @@ void *connection_handler(void *socket_desc)
       // write(newsockfd, key ,256);
       bzero(key,256);
       bzero(word1,256);
+    } else {
+      strcpy(word,error);
+    }
     } else if (strncmp("decrypt",message,7) == 0) {
-      clock_t begin = clock();
-      int userId = rand();
       char word1[50];
-      char key[10];
       strcpy(word1,strtok(NULL," "));
-      trimwhitespace(word1);
-      strcpy(key,decrypt(word1));
-      clock_t end = clock();
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      strcpy(word,key);
-      // trimwhitespace(key);
-      // write(newsockfd, key ,256);
-      bzero(key,10);
+      if (strlen(word1) <= 50) {
+        clock_t begin = clock();
+        int userId = rand();
+
+        char key[10];
+        trimwhitespace(word1);
+        strcpy(key,decrypt(word1));
+        clock_t end = clock();
+        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        strcpy(word,key);
+        bzero(key,10);
+      } else {
+        strcpy(word,error);
+      }
     } else {
       char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
       strcpy(word,message);
@@ -629,4 +651,10 @@ void strrev(unsigned char *str)
   		str[i] = str[j];
   		str[j] = a;
   	}
+  }
+
+  void strreplace(char s[], int i, char repl_chr)
+  {
+    s[i]=repl_chr;
+    printf("%s",s);
   }
