@@ -15,7 +15,11 @@ function priority () {
 		});
 
 		$funName = array();
-		array_push($funName, $infoArray[3]);
+		array_push($funName, $infoArray[1]);
+
+		$time = array();
+		array_push($time, $infoArray[4]);
+
 
 		for ($i = 0; $i <= count($strings); $i++) {
 			if ($strings[0] == $strings[$i]){
