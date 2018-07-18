@@ -29,7 +29,7 @@ void strrev(unsigned char *str);
 int itoa(int num, unsigned char* str, int len, int base);
 char* encrypt(char * word,int size);
 char* decrypt(char * word);
-
+void strreplace(char s[], int i, char repl_chr);
 
 //int argc is the total number of parameters we'll be passing
 int main(int argc, char *argv[])
@@ -241,55 +241,6 @@ void *connection_handler(void *socket_desc)
 
     } else if (strncmp("rep",message,3) == 0)
     {
-      char word2[50];
-      strcpy(word2,strtok(NULL," "));
-      if (strlen(word2) <= 50)
-      {
-      clock_t begin = clock();
-      int userId = rand();
-
-      char *p;
-      p = word2;
-      char replacements[50];
-      int index;
-      char letter[2];
-      letter[1] = '\0';
-
-
-      strcpy(replacements,strtok(NULL," "));
-      printf("%s\n",replacements );
-
-      char segment[4];
-      strcpy(segment,strtok(replacements,","));
-      int i = atoi(strtok(segment,"-"));
-      printf("%d\n",i );
-      strcpy(letter,strtok(NULL,"-"));
-      printf("%s\n",letter );
-      // strcpy(word[i],letter);
-
-      // while( strtok(NULL,",") != NULL ) {
-      //   strcpy(segment,strtok(NULL,","));
-      //   int i = atoi(strtok(word,"-"));
-      //   printf("%d\n",i );
-      //   char letter[2];
-      //   strcpy(letter,strtok(NULL,"-"));
-      //   printf("%s\n",letter );
-      // }
-      // p[index] = letter;
-
-      //replace the character
-      clock_t end = clock();
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,rep,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      strcpy(word,word2);
-
-      // write(newsockfd, word ,50);
-      // bzero(word, 50);
-      bzero(replacements,50);
-      bzero(letter,1);
-    } else {
-      strcpy(word,error);
     }
     } else if (strncmp("encrypt",message,7) == 0) {
       char word1[256];
@@ -654,4 +605,10 @@ void strrev(unsigned char *str)
   		str[i] = str[j];
   		str[j] = a;
   	}
+  }
+
+  void strreplace(char s[], int i, char repl_chr)
+  {
+    s[i]=repl_chr;
+    printf("%s",s);
   }
