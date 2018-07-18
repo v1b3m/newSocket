@@ -11,7 +11,7 @@ function priority () {
 		$strings = array();
 		array_push($strings, $infoArray[2]);
 		uasort($strings, function($a, $b){
-			return strlen($b) <=> strlen($a)
+			return strlen($b) <=> strlen($a);
 		});
 
 		$funName = array();
@@ -20,19 +20,19 @@ function priority () {
 		for ($i = 0; $i <= count($strings); $i++) {
 			if ($strings[0] == $strings[$i]){
 				$priorities = fopen('priorities.txt', 'w+') or die ('Unable to open file!');
-				$num = 1 \n;
+				$num = 1; \n;
 				fwrite('priorities.txt', $num);
 				fclose('priorities.txt');
 			}
 			else if ($funName[$i] == 'replace') {
 				fopen('priorities', 'w') or die ('Unable to open file!');
-				$num = 2\n;
+				$num = 2; \n;
 				fwrite('priorities.txt', $num);
 				fclose('priorities.txt');
 			}
 			else {
 				fopen('priorities.txt', 'w');
-				$num = 3\n;
+				$num = 3; \n;
 				fwrite('priorities.txt', $num);
 				fclose('priorities.txt');
 			}
