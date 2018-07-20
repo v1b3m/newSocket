@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     error("[-]Connection to server failed");
 
     puts("[+]Connected to server...");
+    puts("[+]Please ensure to close your connection after your request, to enable others get their's processed faster.");
     puts("[+]Enter q to end the connection...");
 
   while(1)

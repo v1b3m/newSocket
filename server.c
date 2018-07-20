@@ -241,7 +241,10 @@ void *connection_handler(void *socket_desc)
 
     } else if (strncmp("rep",message,3) == 0)
     {
-    }
+      //some wrork to be done here
+      char * message = "Unfortunately, we're unable to process this request at the moment!";
+      strcpy(word,message);
+    
     } else if (strncmp("encrypt",message,7) == 0) {
       char word1[256];
       strcpy(word1,strtok(NULL," "));
