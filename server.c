@@ -122,11 +122,13 @@ void *connection_handler(void *socket_desc)
     fp = fopen("ready_jobs.txt","a");
     char message[256];
     char* word1;
+    char* soloJobs;
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
     printf("Client: %s\n",buffer);
     strcpy(message,buffer);
+    soloJobs = strtok(message,";");
     word1 = strtok(message," ");
 
     //reversing the function
