@@ -1,3 +1,14 @@
+<?php
+  session_start();
+  $username = $_SESSION['username'];// Username has to be changed to fit the DB
+  $password = $_SESSION['password'];// Password should be changed to fit the DB
+  
+  require_once('connectvars.php');// The value has to be changed to fit the DB 
+  
+  $query = "SELECT * FROM  whatever WHERE password = '$password'"; // Values shoud be changed according to the DB
+  $data = mysql_query($dbc, $query);
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -65,36 +76,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Decrypt</td>
-              <td>52%</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Replace</td>
-              <td>63%</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Delete</td>
-              <td>65%</td>
-            </tr>
-            <tr>
-              <th scope="row">4</th>
-              <td>Encrypt</td>
-              <td>75%</td>
-            </tr>
-            <tr>
-              <th scope="row">5</th>
-              <td>Double</td>
-              <td>86%</td>
-            </tr>
-            <tr>
-              <th scope="row">6</th>
-              <td>Reverse</td>
-              <td>90%</td>
-            </tr>
+            <?php
+              require_once('connectvars.php');// Change values to fit the DB
+                  $query1 = "SELECT * FROM tablename WHERE password = '$password'";// Change values to fit the DB tables 
+                  $result = mysql_query($dbc, $query1) or die ('Error querying database.');
+                  $data1 = mysql_query($dbc, $query);// Change values to fit the DB
+
+                  while ($row = mysql_fetch_array($result)) {
+                    echo '<tr><td>'.$row['#'].'</td><td>'.$row['Student Job'].'</td><td>'.$row['Percentage Rate'].'</td>';
+                    echo '</tr>';
+                    $high += $row['Percentage Rate'];
+                  }
+            ?>      
         </table>
         <canvas id="doughnutChart"></canvas>
     </div>

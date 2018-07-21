@@ -83,7 +83,7 @@
               $data1 = mysql_query($dbc, $query);// Change values to fit the DB
 
               while ($row = mysql_fetch_array($result)) {
-                echo '<tr><td>'.$row['Student Job'].'</td><td>'.$row['Percentage Rate'].'</td>';
+                echo '<tr><td>'.$row['#'].'</td><td>'.$row['Student Job'].'</td><td>'.$row['Percentage Rate'].'</td>';
                 echo '</tr>';
                 $high += $row['Percentage Rate'];
               }
