@@ -119,7 +119,7 @@ void *connection_handler(void *socket_desc)
   while((read_size = read(sock, buffer, 256)) > 0)
   {
 
-    fp = fopen("ready_jobs.txt","a");
+    fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
     char message[256];
     char* word1;
     char* token;
