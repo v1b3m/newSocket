@@ -1,4 +1,5 @@
 # newSocket
+<<<<<<< HEAD
 # newSocket
 Word Task Server
 Each BSE 2017 student is required to perform the following tasks on words,
@@ -49,6 +50,8 @@ saved to a fle called busy_list and priority given to them as follows. A given j
 receives a priority number based on the sum of the following conditions:
 1. Priority 1, which is the highest if job contains the least number of characters
 2. Priority 2, if owner has the highest number o# newSocket
+=======
+>>>>>>> trial
 Word Task Server
 Each BSE 2017 student is required to perform the following tasks on words,
 including the following commands and functions
@@ -135,6 +138,7 @@ shall submit an assessment for each of the members they will supervise
 Additional Information.
 To add the sql database to your server use the command below
 mysql -u username -p database_name < processed_jobs.sql
+<<<<<<< HEAD
 f waiting jobs
 3. Priority 3, if replace function
 Jobs with the least number of priority are scheduled frst while Jobs with the same
@@ -174,3 +178,5 @@ Additional Information.
 To add the sql database to your server use the command below
 
 mysql -u username -p database_name < processed_jobs.sql
+=======
+>>>>>>> trial
