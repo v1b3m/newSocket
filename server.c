@@ -112,191 +112,445 @@ void *connection_handler(void *socket_desc)
   char buffer[256];
   char word[256];
   FILE * fp;
+  fp = fopen("ready_jobs.txt","a");
   bzero(word,256);
   bzero(buffer,256);
   char error[100] = "Job too long, please enter something your height.";
 
   while((read_size = read(sock, buffer, 256)) > 0)
   {
-
-    fp = fopen("ready_jobs.txt","a");
     char message[256];
     char* word1;
+    char* token;
+    char* msgdup;
+    char dup[256];
     time_t t = time(NULL);
+    int i = 0;
     struct tm tm = *localtime(&t);
 
     printf("Client: %s\n",buffer);
     strcpy(message,buffer);
-    word1 = strtok(message," ");
+    strcpy(dup,buffer);
+    msgdup = message;
+
+    //number of tasks in the message
+    token = strtok(msgdup,";");
+    while(token != NULL) {
+    i++;
+    token = strtok(NULL,";");
+    }
 
     //reversing the function
     int a;
     srand(time(NULL));
-    if(strncmp("rev",message,3) == 0)
-    {
-      word1 = strtok(NULL," ");
-      if (strlen(word1) <= 50 )
+    if(i == 1) {
+      word1 = strtok(message," ");
+      if(strncmp("rev",message,3) == 0)
       {
-      clock_t begin = clock();
-      int userId = rand();
-
-      int i, j, temp;
-      int l = strlen(word1);
-
-
-        for (i = 0, j = l - 1; i < j; i++, j--) {
-        temp = word1[i];
-        word1[i] = word1[j];
-        word1[j] = temp;
-        }
-        word1 = trimwhitespace(word1);
-        clock_t end = clock();
-        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        strcpy(word,word1);
-
-          fprintf(fp,"%d,rev,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      } else {
-        strcpy(word,error);
-      }
-
-    } else if (strncmp("double",message,6) == 0)
-    {
-      char* job;
-      // strcpy(job,strtok(NULL," "));
-      clock_t begin = clock();
-      int userId = rand();
-      job = strtok(NULL," ");
-      if(strlen(job) <= 50 ) {
-      dbl(job);
-      clock_t end = clock();
-      strcpy(word,job);
-
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-    } else {
-      strcpy(word,error);
-    }
-
-    } else if (strncmp("del",message,3) == 0)
-    {
-      word1 = strtok(NULL," ");
-      if (strlen(word1) <= 50)
-      {
-      clock_t begin = clock();
-      int userId = rand();
-      // char word[50];
-      char numbers[20];
-
-      //initialize array to hold the indexes to be deleted
-      int num[10]={0};
-
-
-      strcpy(numbers,strtok(NULL," "));
-
-      int n = strlen(numbers);
-
-      num[0] = atoi(strtok(numbers,","));
-
-      for(int i=1;i<(n/2);i++) {
-        num[i] = atoi(strtok(NULL,","));
-      }
-
-      // sort the array in ascending order
-      for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
-      {
-      	for (int j = 0; j < 10; j++)             //Loop for comparing other values
-      	{
-      		if (num[j] > num[i])                //Comparing other array elements
-      		{
-      			int tmp = num[i];         //Using temporary variable for storing last value
-      			num[i] = num[j];            //replacing value
-      			num[j] = tmp;             //storing last value
-      		}
-      	}
-      }
-
-    int j=1;
-    for(int i=0;i<10;i++){
-      if(num[i] != 0) {
-        del(word1,num[i]-j);
-        j++;
-      }
-    }
-    clock_t end = clock();
-    strcpy(word,word1);
-
-
-    // n = write(newsockfd, word ,sizeof(word));
-    // if (n < 0 ) {
-    //   error("Error on writing");
-    // } else {
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,del,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-    } else {
-      strcpy(word,error);
-    }
-
-    } else if (strncmp("rep",message,3) == 0)
-    {
-      //some wrork to be done here
-      char * message = "Unfortunately, we're unable to process this request at the moment!";
-      strcpy(word,message);
-    
-    } else if (strncmp("encrypt",message,7) == 0) {
-      char word1[256];
-      strcpy(word1,strtok(NULL," "));
-      if (strlen(word1) <= 50)
-      {
-      clock_t begin = clock();
-      int userId = rand();
-
-      char key[256];
-
-      trimwhitespace(word1);
-      int size = strlen(word1);
-      strcpy(key,encrypt(word1,size));
-      clock_t end = clock();
-      double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-      fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-      tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-      trimwhitespace(key);
-      strcpy(word,key);
-      // write(newsockfd, key ,256);
-      bzero(key,256);
-      bzero(word1,256);
-    } else {
-      strcpy(word,error);
-    }
-    } else if (strncmp("decrypt",message,7) == 0) {
-      char word1[50];
-      strcpy(word1,strtok(NULL," "));
-      if (strlen(word1) <= 50) {
+        word1 = strtok(NULL," ");
+        if (strlen(word1) <= 50 )
+        {
         clock_t begin = clock();
         int userId = rand();
 
-        char key[10];
-        trimwhitespace(word1);
-        strcpy(key,decrypt(word1));
+        int i, j, temp;
+        int l = strlen(word1);
+
+
+          for (i = 0, j = l - 1; i < j; i++, j--) {
+          temp = word1[i];
+          word1[i] = word1[j];
+          word1[j] = temp;
+          }
+          word1 = trimwhitespace(word1);
+          clock_t end = clock();
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          strcpy(word,word1);
+
+            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        } else {
+          strcpy(word,error);
+        }
+
+      } else if (strncmp("dbl",message,3) == 0)
+      {
+        char* job;
+        // strcpy(job,strtok(NULL," "));
+        clock_t begin = clock();
+        int userId = rand();
+        job = strtok(NULL," ");
+        if(strlen(job) <= 50 ) {
+        dbl(job);
         clock_t end = clock();
+        strcpy(word,job);
+
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-        strcpy(word,key);
-        bzero(key,10);
       } else {
         strcpy(word,error);
       }
+
+      } else if (strncmp("del",message,3) == 0)
+      {
+        word1 = strtok(NULL," ");
+        if (strlen(word1) <= 50)
+        {
+        clock_t begin = clock();
+        int userId = rand();
+        // char word[50];
+        char numbers[20];
+
+        //initialize array to hold the indexes to be deleted
+        int num[10]={0};
+
+
+        strcpy(numbers,strtok(NULL," "));
+
+        int n = strlen(numbers);
+
+        num[0] = atoi(strtok(numbers,","));
+
+        for(int i=1;i<(n/2);i++) {
+          num[i] = atoi(strtok(NULL,","));
+        }
+
+        // sort the array in ascending order
+        for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
+        {
+        	for (int j = 0; j < 10; j++)             //Loop for comparing other values
+        	{
+        		if (num[j] > num[i])                //Comparing other array elements
+        		{
+        			int tmp = num[i];         //Using temporary variable for storing last value
+        			num[i] = num[j];            //replacing value
+        			num[j] = tmp;             //storing last value
+        		}
+        	}
+        }
+
+      int j=1;
+      for(int i=0;i<10;i++){
+        if(num[i] != 0) {
+          del(word1,num[i]-j);
+          j++;
+        }
+      }
+      clock_t end = clock();
+      strcpy(word,word1);
+
+        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+      } else {
+        strcpy(word,error);
+      }
+
+      } else if (strncmp("rep",message,3) == 0)
+      {
+        //some wrork to be done here
+        char * message = "Unfortunately, we're unable to process this request at the moment!";
+        strcpy(word,message);
+
+      } else if (strncmp("enc",message,3) == 0) {
+        char word1[256];
+        strcpy(word1,strtok(NULL," "));
+        if (strlen(word1) <= 50)
+        {
+        clock_t begin = clock();
+        int userId = rand();
+
+        char key[256];
+
+        trimwhitespace(word1);
+        int size = strlen(word1);
+        strcpy(key,encrypt(word1,size));
+        clock_t end = clock();
+        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        trimwhitespace(key);
+        strcpy(word,key);
+        // write(newsockfd, key ,256);
+        bzero(key,256);
+        bzero(word1,256);
+      } else {
+        strcpy(word,error);
+      }
+    } else if (strncmp("dec",message,3) == 0) {
+        char word1[50];
+        strcpy(word1,strtok(NULL," "));
+        if (strlen(word1) <= 50) {
+          clock_t begin = clock();
+          int userId = rand();
+
+          char key[10];
+          trimwhitespace(word1);
+          strcpy(key,decrypt(word1));
+          clock_t end = clock();
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          strcpy(word,key);
+          bzero(key,10);
+        } else {
+          strcpy(word,error);
+        }
+      } else {
+        char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
+        strcpy(word,message);
+      }
+
+      trimwhitespace(word);
+      write(sock, word ,strlen(word));
+      bzero(word,256);
     } else {
-      char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
-      strcpy(word,message);
+      // char* reply = "Wassup";
+      char* array[i];
+      char word[256];
+      int j=0;
+      int userId = rand();
+      // fp = fopen("busy_list.txt","a");
+      token = strtok(dup,";");
+
+      //split the string into tokens and store them in array
+      while(token != NULL) {
+        array[j++] = token;
+        // len[j++] = strlen(array[j++]);
+      // fprintf(fp,"%d %s\n",userId,token);
+      token = strtok(NULL,";");
+      }
+      for (j=0;j<i;++j){
+        char* type;
+        char* word1;
+        char job[256];
+        strcpy(job,array[j]);
+        printf("Job: %s\n",job );
+
+        strcat(word,"");
+        type = strtok(array[j]," ");
+        printf("Type: %s\n",type );
+        if(strncmp("rev",type,3) == 0)
+        {
+          word1 = strtok(NULL," ");
+          printf("%s\n",word1 );
+          if (strlen(word1) <= 50 )
+          {
+          clock_t begin = clock();
+          int userId = rand();
+
+          int i, j, temp;
+          int l = strlen(word1);
+
+
+            for (i = 0, j = l - 1; i < j; i++, j--) {
+            temp = word1[i];
+            word1[i] = word1[j];
+            word1[j] = temp;
+            }
+            word1 = trimwhitespace(word1);
+            clock_t end = clock();
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,word1);
+            strcat(word,",");
+            trimwhitespace(word);
+
+            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          } else {
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,error);
+            strcat(word,",");
+          }
+
+        } else if (strncmp("dbl",type,3) == 0)
+        {
+          char* job1;
+          // strcpy(job,strtok(NULL," "));
+          clock_t begin = clock();
+          int userId = rand();
+          job1 = strtok(NULL," ");
+          if(strlen(job1) <= 50 ) {
+          dbl(job1);
+          clock_t end = clock();
+
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,job1);
+          strcat(word,",");
+          trimwhitespace(word);
+
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        } else {
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,error);
+          strcat(word,",");
+        }
+
+      } else if (strncmp("del",type,3) == 0)
+        {
+          word1 = strtok(NULL," ");
+          if (strlen(word1) <= 50)
+          {
+          clock_t begin = clock();
+          int userId = rand();
+          // char word[50];
+          char numbers[20];
+
+          //initialize array to hold the indexes to be deleted
+          int num[10]={0};
+
+
+          strcpy(numbers,strtok(NULL," "));
+
+          int n = strlen(numbers);
+
+          num[0] = atoi(strtok(numbers,","));
+
+          for(int i=1;i<(n/2);i++) {
+            num[i] = atoi(strtok(NULL,","));
+          }
+
+          // sort the array in ascending order
+          for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
+          {
+          	for (int j = 0; j < 10; j++)             //Loop for comparing other values
+          	{
+          		if (num[j] > num[i])                //Comparing other array elements
+          		{
+          			int tmp = num[i];         //Using temporary variable for storing last value
+          			num[i] = num[j];            //replacing value
+          			num[j] = tmp;             //storing last value
+          		}
+          	}
+          }
+
+        int j=1;
+        for(int i=0;i<10;i++){
+          if(num[i] != 0) {
+            del(word1,num[i]-j);
+            j++;
+          }
+        }
+        clock_t end = clock();
+
+        strcat(word,job);
+        trimwhitespace(word);
+        strcat(word,": ");
+        strcat(word,word1);
+        strcat(word,",");
+        trimwhitespace(word);
+
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        } else {
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,error);
+          strcat(word,",");
+        }
+
+      } else if (strncmp("rep",type,3) == 0)
+        {
+          //some wrork to be done here
+          char * message = "Unfortunately, we're unable to process this request at the moment!";
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,message);
+          strcat(word,",");
+          trimwhitespace(word);
+
+        } else if (strncmp("encrypt",type,3) == 0) {
+          char word1[256];
+          strcpy(word1,strtok(NULL," "));
+          if (strlen(word1) <= 50)
+          {
+          clock_t begin = clock();
+          int userId = rand();
+
+          char key[256];
+
+          trimwhitespace(word1);
+          int size = strlen(word1);
+          strcpy(key,encrypt(word1,size));
+          clock_t end = clock();
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          trimwhitespace(key);
+          // strcpy(word,key);
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,key);
+          strcat(word,",");
+          trimwhitespace(word);
+
+          bzero(key,256);
+          bzero(word1,256);
+        } else {
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,error);
+          strcat(word,",");
+        }
+      } else if (strncmp("dec",type,3) == 0) {
+          char word1[50];
+          strcpy(word1,strtok(NULL," "));
+          if (strlen(word1) <= 50) {
+            clock_t begin = clock();
+            int userId = rand();
+
+            char key[10];
+            trimwhitespace(word1);
+            strcpy(key,decrypt(word1));
+            clock_t end = clock();
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,key);
+            strcat(word,",");
+            trimwhitespace(word);
+            bzero(key,10);
+          } else {
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,error);
+            strcat(word,",");
+          }
+        } else {
+          char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
+          strcpy(word,message);
+        }
+
+      }
+      trimwhitespace(word);
+      write(sock, word ,strlen(word));
+      bzero(word,256);
     }
 
-    trimwhitespace(word);
-    write(sock, word ,strlen(word));
-    bzero(word,256);
+
     bzero(buffer,256);
     fclose(fp);
   }
@@ -319,6 +573,7 @@ void *connection_handler(void *socket_desc)
   pthread_exit(NULL);
 
 }
+
 
 //this is the method to double the strings
 void dbl(char s[]) {
