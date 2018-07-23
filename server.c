@@ -112,13 +112,14 @@ void *connection_handler(void *socket_desc)
   char buffer[256];
   char word[256];
   FILE * fp;
-  fp = fopen("ready_jobs.txt","a");
   bzero(word,256);
   bzero(buffer,256);
   char error[100] = "Job too long, please enter something your height.";
 
   while((read_size = read(sock, buffer, 256)) > 0)
   {
+
+    fp = fopen("ready_jobs.txt","a");
     char message[256];
     char* word1;
     char* token;
@@ -338,7 +339,6 @@ void *connection_handler(void *socket_desc)
           if (strlen(word1) <= 50 )
           {
           clock_t begin = clock();
-          int userId = rand();
 
           int i, j, temp;
           int l = strlen(word1);
@@ -375,7 +375,6 @@ void *connection_handler(void *socket_desc)
           char* job1;
           // strcpy(job,strtok(NULL," "));
           clock_t begin = clock();
-          int userId = rand();
           job1 = strtok(NULL," ");
           if(strlen(job1) <= 50 ) {
           dbl(job1);
@@ -405,7 +404,6 @@ void *connection_handler(void *socket_desc)
           if (strlen(word1) <= 50)
           {
           clock_t begin = clock();
-          int userId = rand();
           // char word[50];
           char numbers[20];
 
@@ -468,7 +466,12 @@ void *connection_handler(void *socket_desc)
         {
           //some wrork to be done here
           char * message = "Unfortunately, we're unable to process this request at the moment!";
-          strcpy(word,message);
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,message);
+          strcat(word,",");
+          trimwhitespace(word);
 
         } else if (strncmp("enc",type,3) == 0) {
           char word1[256];
@@ -476,7 +479,6 @@ void *connection_handler(void *socket_desc)
           if (strlen(word1) <= 50)
           {
           clock_t begin = clock();
-          int userId = rand();
 
           char key[256];
 
@@ -510,7 +512,6 @@ void *connection_handler(void *socket_desc)
           strcpy(word1,strtok(NULL," "));
           if (strlen(word1) <= 50) {
             clock_t begin = clock();
-            int userId = rand();
 
             char key[10];
             trimwhitespace(word1);
