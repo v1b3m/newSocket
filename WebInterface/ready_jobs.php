@@ -1,3 +1,9 @@
+<?php
+  $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
+  $query = "SELECT * FROM  processed_jobs"; // Values shoud be changed according to the DB
+  $data = mysqli_query($con, $query);
+
+?>
 <!DOCTYPE html>
 <html>
 
@@ -28,15 +34,15 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Job ratings
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="highsuccess.html">Highest success rate</a>
-            <a class="dropdown-item" href="lowsuccess.html">Lowest success rate</a>
+            <a class="dropdown-item" href="highsuccess.php">Highest success rate</a>
+            <a class="dropdown-item" href="lowsuccess.php">Lowest success rate</a>
             <!-- <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Something else here</a> -->
           </div>
@@ -66,48 +72,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">000767</th>
-              <td>408326487</td>
-              <td>Reverse</td>
-              <td>0.000007</td>
-              <td>2018-07-13 09:28:10</td>
-            </tr>
-            <tr>
-              <th scope="row">000768</th>
-              <td>137512622</td>
-              <td>Reverse</td>
-              <td>0.000003</td>
-              <td>2018-07-13 09:31:14</td>
-            </tr>
-            <tr>
-              <th scope="row">000769</th>
-              <td>1545543631</td>
-              <td>Double</td>
-              <td>0.000005</td>
-              <td>2018-07-13 09:31:21</td>
-            </tr>
-            <tr>
-              <th scope="row">000770</th>
-              <td>665602087</td>
-              <td>Delete</td>
-              <td>0.000014</td>
-              <td>2018-07-13 09:31:27</td>
-            </tr>
-            <tr>
-              <th scope="row">000771</th>
-              <td>1312043568</td>
-              <td>Encrypt</td>
-              <td>0.000037</td>
-              <td>2018-07-13 09:31:44</td>
-            </tr>
-            <tr>
-              <th scope="row">000775</th>
-              <td>882155557</td>
-              <td>Decrypt</td>
-              <td>0.000296</td>
-              <td>2018-07-13 09:32:58</td>
-            </tr>
+            <?php
+            while($row = mysqli_fetch_array($data)){
+            echo '<tr>
+              <th scope="row">'.$row['job_id'].'</th>
+              <td>'.$row['user_id'].'</td>
+              <td>'.$row['type_of_task'].'</td>
+              <td>'.$row['processing_duration'].'</td>
+              <td>'.$row['time_and_date'].'</td>
+            </tr>';
+          }
+            ?>
+          </tbody>
         </table>
     </div>
   </div>

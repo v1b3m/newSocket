@@ -1,3 +1,19 @@
+<?php
+  $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
+  $query = "SELECT * FROM  processed_jobs"; // Values shoud be changed according to the DB
+  $data = mysqli_query($con, $query);
+
+  $num = 0;
+  $sum = 0;
+  while($row = mysqli_fetch_array($data)){
+    $num++;
+    $sum += $row['processing_duration'];
+  }
+
+  $average = $num/$sum;
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +31,33 @@
   <link rel="stylesheet" href="assets/css/media-queries.css">
   <link rel="stylesheet" href="css/style.css">
   <title>Home</title>
+  <script>
+window.onload = function () {
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+	exportEnabled: true,
+	theme: "light1", // "light1", "light2", "dark1", "dark2"
+	title:{
+		text: "Simple Column Chart showing average server processing speed"
+	},
+	data: [{
+		type: "line", //change type to bar, line, area, pie, etc
+		//indexLabel: "{y}", //Shows y value on all Data Points
+		indexLabelFontColor: "#5A5757",
+		indexLabelPlacement: "outside",
+		dataPoints: [
+			{ x: 0, y: 0 },
+			{ x: 15720.081135903, y: 1 },
+
+
+		]
+	}]
+});
+chart.render();
+
+}
+</script>
 </head>
 <body>
   <div class="container-fluid">
@@ -27,15 +70,15 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Job ratings
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="highsuccess.html">Highest success rate</a>
-            <a class="dropdown-item" href="lowsuccess.html">Lowest success rate</a>
+            <a class="dropdown-item" href="highsuccess.php">Highest success rate</a>
+            <a class="dropdown-item" href="lowsuccess.php">Lowest success rate</a>
             <!-- <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Something else here</a> -->
           </div>
@@ -44,7 +87,7 @@
           <a class="nav-link" href="waitingjobs.html">Waiting Jobs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="ready_jobs.html">Ready Jobs</a>
+          <a class="nav-link" href="ready_jobs.php">Ready Jobs</a>
         </li>
 
       </ul>
@@ -54,9 +97,11 @@
     <br/><br/>
     <div class="text-center">
       <h1>Average server processing</h1>
-        <span class="chart" data-percent="90"></span>
-      <h5><span>1000 Jobs/min <i class="fa fa-arrow-circle-up"></i></span>
-      <br/>
+        <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+        <!-- <span class="chart" data-percent="90"></span> -->
+
+      <br/><h5><span><?php echo round($average) .' jobs/s'; ?><i class="fa fa-arrow-circle-up"></i></span>
+      <br/><br/>
      <span>90% Job completion Accuracy</span></h5>
     </div>
   </div>
@@ -135,13 +180,14 @@
 <!-- Bootstrap core JavaScript -->
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <!-- MDB core JavaScript -->
-<script type="text/javascript" src="js/mdb.min.js"></script>
-<script src="js/jquery.easypiechart.js"></script>
-<script>
+<!-- <script type="text/javascript" src="js/mdb.min.js"></script> -->
+<!-- <script src="js/jquery.easypiechart.js"></script> -->
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<!-- <script>
     $(function () {
         $('.chart').easyPieChart({
             //put options here
         });
     });
-</script>
+</script> -->
 </html>
