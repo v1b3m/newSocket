@@ -67,10 +67,6 @@ int main(int argc, char *argv[])
 
   while(1)
   {
-    char Id[10];
-    strcpy(Id,argv[4]);
-    // printf("Username:");
-    // scanf("%s\n",Id);
     printf("Client: ");
     bzero(buffer,255);
     fgets(buffer,255,stdin);
