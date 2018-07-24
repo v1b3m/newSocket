@@ -168,7 +168,7 @@ void *connection_handler(void *socket_desc)
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
           strcpy(word,word1);
 
-            fprintf(fp,"%d,rev,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
         } else {
           strcpy(word,error);
@@ -242,7 +242,7 @@ void *connection_handler(void *socket_desc)
       strcpy(word,word1);
 
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        fprintf(fp,"%d,del,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+        fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
       } else {
         strcpy(word,error);
@@ -360,7 +360,7 @@ void *connection_handler(void *socket_desc)
             strcat(word,",");
             trimwhitespace(word);
 
-            fprintf(fp,"%d,rev,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
           } else {
             strcat(word,job);
@@ -452,7 +452,7 @@ void *connection_handler(void *socket_desc)
         trimwhitespace(word);
 
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-          fprintf(fp,"%d,del,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
         } else {
           strcat(word,job);
