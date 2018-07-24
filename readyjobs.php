@@ -1,6 +1,6 @@
 <?php
   $servername = "localhost";
-  $username = "root";
+  $username = "benjie";
   $password = "n0p@55w0RD";
   $dbname = "stringServer";
 
@@ -13,15 +13,14 @@
   }
   echo "Connected successfully<br/>";
 
-  $file = 'ready_jobs.txt';
-  $myfile = fopen('home/v1b3m/Desktop/jjsocket/ready_jobs.txt','r') or die ('Unable to open file');
+  $myfile = fopen('/var/www/html/stringServer/ready_jobs.txt','r+') or die ('Unable to open file');
 
   //output one line until end-of-file
   while(!feof($myfile)) {
     $data = fgets($myfile);
     $datum = explode(",",$data);
 
-    $sql = "INSERT INTO processed_jobs VALUES (0,0,'$datum[0]','$datum[1]','$datum[2]')";
+    $sql = "INSERT INTO processed_jobs VALUES (0,$datum[0],'$datum[1]','$datum[2]','$datum[3]')";
 
     //query the database
     if (mysqli_query($conn, $sql)) {
@@ -33,5 +32,6 @@
 
 
   mysqli_close($conn);
+  ftruncate($myfile,0);
   fclose($myfile);
 ?>
