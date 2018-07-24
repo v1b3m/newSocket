@@ -1,12 +1,16 @@
 <?php
-  session_start();
-  $username = $_SESSION['username'];// Username has to be changed to fit the DB
-  $password = $_SESSION['password'];// Password should be changed to fit the DB
-  
-  require_once('connectvars.php');// The value has to be changed to fit the DB 
-  
-  $query = "SELECT * FROM  whatever WHERE password = '$password'"; // Values shoud be changed according to the DB
-  $data = mysql_query($dbc, $query);
+  $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
+  $query = "SELECT * FROM processed_jobs";
+  $data = mysqli_query($con, $query);
+
+  while($row = mysqli_fetch_array($data)){
+    $arr[] = $row['user_id'];
+  }
+
+  $values = array_count_values($arr);
+  arsort($values);
+  $popular = array_slice(array_keys($values),0,10,true);
+  echo $values[1];
 ?>
 
 <!DOCTYPE html>
@@ -76,18 +80,59 @@
             </tr>
           </thead>
           <tbody>
-            <?php
-              require_once('connectvars.php');// Change values to fit the DB
-                  $query1 = "SELECT * FROM tablename WHERE password = '$password'";// Change values to fit the DB tables 
-                  $result = mysql_query($dbc, $query1) or die ('Error querying database.');
-                  $data1 = mysql_query($dbc, $query);// Change values to fit the DB
-
-                  while ($row = mysql_fetch_array($result)) {
-                    echo '<tr><td>'.$row['#'].'</td><td>'.$row['Student Job'].'</td><td>'.$row['Percentage Rate'].'</td>';
-                    echo '</tr>';
-                    $high += $row['Percentage Rate'];
-                  }
-            ?>      
+          <?php
+            echo '
+            <tr>
+              <th scope="row">1</th>
+              <td>'.$arr[0].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>'.$arr[1].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>'.$arr[2].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">4</th>
+              <td>'.$arr[3].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">5</th>
+              <td>'.$arr[4].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">6</th>
+              <td>'.$arr[5].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">7</th>
+              <td>'.$arr[6].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">8</th>
+              <td>'.$arr[7].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">9</th>
+              <td>'.$arr[8].'</td>
+              <td>#</td>
+            </tr>
+            <tr>
+              <th scope="row">10</th>
+              <td>'.$arr[9].'</td>
+              <td>#</td>
+            </tr>';
+            ?>   
         </table>
         <canvas id="doughnutChart"></canvas>
     </div>
