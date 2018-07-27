@@ -201,7 +201,7 @@
                   <p>
                     <a href="#"><i class="fab fa-facebook"></i></a>
           <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-google-plus-g"></i></a>
+          <a href="https://github.com/v1b3m/newSocket" target="_blank"><i class="fab fa-github-square"></i></a>
           <a href="#"><i class="fab fa-instagram"></i></a>
           <a href="#"><i class="fab fa-pinterest"></i></a>
                   </p>

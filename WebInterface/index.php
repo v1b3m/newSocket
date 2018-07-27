@@ -1,5 +1,6 @@
 <?php
-  $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
+  $con = mysqli_connect("localhost","benjie","n0p@55w0RD","stringServer")
+  or die('Unable to connect to database');
   $query = "SELECT * FROM  processed_jobs"; // Values shoud be changed according to the DB
   $data = mysqli_query($con, $query);
 
@@ -9,6 +10,15 @@
     $num++;
     $sum += $row['processing_duration'];
   }
+
+  $completed = mysqli_num_rows($data);
+
+  $query1 = "SELECT * FROM blacklist";
+  $data1 = mysqli_query($con,$query1);
+
+  $failed = mysqli_num_rows($data1);
+
+  $completion = $completed/($completed + $failed)*100;
 
   $average = $num/$sum;
 
@@ -48,7 +58,7 @@ var chart = new CanvasJS.Chart("chartContainer", {
 		indexLabelPlacement: "outside",
 		dataPoints: [
 			{ x: 0, y: 0 },
-			{ x: 15720.081135903, y: 1 },
+			{ x: <?php echo $average; ?>, y: 1 },
 
 
 		]
@@ -102,7 +112,7 @@ chart.render();
 
       <br/><h5><span><?php echo round($average) .' jobs/s'; ?><i class="fa fa-arrow-circle-up"></i></span>
       <br/><br/>
-     <span>90% Job completion Accuracy</span></h5>
+     <span><?php echo round($completion); ?>% Job completion Accuracy</span></h5>
     </div>
   </div>
   <footer class="foot-color">
@@ -128,7 +138,7 @@ chart.render();
                   <p>
                     <a href="#"><i class="fab fa-facebook"></i></a>
           <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-google-plus-g"></i></a>
+          <a href="https://github.com/v1b3m/newSocket" target="_blank"><i class="fab fa-github-square"></i></a>
           <a href="#"><i class="fab fa-instagram"></i></a>
           <a href="#"><i class="fab fa-pinterest"></i></a>
                   </p>
