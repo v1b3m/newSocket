@@ -109,9 +109,10 @@ void *connection_handler(void *socket_desc)
 {
   int sock = *(int*)socket_desc;
   int read_size;
+  int userId = rand();
   char buffer[256];
   char word[256];
-  FILE * fp;
+  FILE * fp,* fb;
   bzero(word,256);
   bzero(buffer,256);
   char error[100] = "Job too long, please enter something your height.";
@@ -120,6 +121,7 @@ void *connection_handler(void *socket_desc)
   {
 
     fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+    fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
     char message[256];
     char* word1;
     char* token;
@@ -143,6 +145,8 @@ void *connection_handler(void *socket_desc)
 
     //reversing the function
     int a;
+    
+
     srand(time(NULL));
     if(i == 1) {
       word1 = strtok(message," ");
@@ -152,8 +156,7 @@ void *connection_handler(void *socket_desc)
         if (strlen(word1) <= 50 )
         {
         clock_t begin = clock();
-        int userId = rand();
-
+        
         int i, j, temp;
         int l = strlen(word1);
 
@@ -168,9 +171,11 @@ void *connection_handler(void *socket_desc)
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
           strcpy(word,word1);
 
-            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
         } else {
+          fprintf(fb,"%d,reverse,%s\n",userId,message);
+          fprintf(fb,"%s","Hey mama");
           strcpy(word,error);
         }
 
@@ -179,7 +184,7 @@ void *connection_handler(void *socket_desc)
         char* job;
         // strcpy(job,strtok(NULL," "));
         clock_t begin = clock();
-        int userId = rand();
+        // int userId = rand();
         job = strtok(NULL," ");
         if(strlen(job) <= 50 ) {
         dbl(job);
@@ -199,7 +204,7 @@ void *connection_handler(void *socket_desc)
         if (strlen(word1) <= 50)
         {
         clock_t begin = clock();
-        int userId = rand();
+        // int userId = rand();
         // char word[50];
         char numbers[20];
 
@@ -260,7 +265,7 @@ void *connection_handler(void *socket_desc)
         if (strlen(word1) <= 50)
         {
         clock_t begin = clock();
-        int userId = rand();
+        // int userId = rand();
 
         char key[256];
 
@@ -284,7 +289,7 @@ void *connection_handler(void *socket_desc)
         strcpy(word1,strtok(NULL," "));
         if (strlen(word1) <= 50) {
           clock_t begin = clock();
-          int userId = rand();
+          // int userId = rand();
 
           char key[10];
           trimwhitespace(word1);
@@ -311,7 +316,7 @@ void *connection_handler(void *socket_desc)
       char* array[i];
       char word[256];
       int j=0;
-      int userId = rand();
+      // int userId = rand();
       // fp = fopen("busy_list.txt","a");
       token = strtok(dup,";");
 
@@ -335,7 +340,6 @@ void *connection_handler(void *socket_desc)
         if(strncmp("rev",type,3) == 0)
         {
           word1 = strtok(NULL," ");
-          printf("%s\n",word1 );
           if (strlen(word1) <= 50 )
           {
           clock_t begin = clock();

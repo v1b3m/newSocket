@@ -84,31 +84,7 @@ int main(int argc, char *argv[])
     if (n < 0)
       error("ERROR reading from socket");
     printf("Server: %s\n",buffer);
-    //
-    // int i = strncmp("Bye",buffer, 3);
-    // if(i == 0)
-    //   break;
   }
   close(sockfd);
   return 0;
-}
-
-char *trimwhitespace(char *str)
-{
-  char *end;
-
-  // Trim leading space
-  while(isspace((unsigned char)*str)) str++;
-
-  if(*str == 0)  // All spaces?
-    return str;
-
-  // Trim trailing space
-  end = str + strlen(str) - 1;
-  while(end > str && isspace((unsigned char)*end)) end--;
-
-  // Write new null terminator character
-  end[1] = '\0';
-
-  return str;
 }
