@@ -112,16 +112,14 @@ void *connection_handler(void *socket_desc)
   int userId = rand();
   char buffer[256];
   char word[256];
-  FILE * fp,* fb;
+  FILE * fp,* fb,*a1;
   bzero(word,256);
   bzero(buffer,256);
   char error[100] = "Job too long, please enter something your height.";
 
   while((read_size = read(sock, buffer, 256)) > 0)
   {
-
-    fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-    fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+    
     char message[256];
     char* word1;
     char* token;
@@ -171,11 +169,14 @@ void *connection_handler(void *socket_desc)
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
           strcpy(word,word1);
 
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
           fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
         } else {
-          fprintf(fb,"%d,reverse,%s\n",userId,message);
-          fprintf(fb,"%s","Hey mama");
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d reverse\n",userId);
+          fclose(fb);
           strcpy(word,error);
         }
 
@@ -192,9 +193,14 @@ void *connection_handler(void *socket_desc)
         strcpy(word,job);
 
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
         fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        fclose(fp);
       } else {
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d double\n",userId);
+        fclose(fb);
         strcpy(word,error);
       }
 
@@ -247,9 +253,14 @@ void *connection_handler(void *socket_desc)
       strcpy(word,word1);
 
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
         fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        fclose(fp);
       } else {
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d delete\n",userId);
+        fclose(fb);
         strcpy(word,error);
       }
 
@@ -274,14 +285,19 @@ void *connection_handler(void *socket_desc)
         strcpy(key,encrypt(word1,size));
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
         fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+        fclose(fp);
         trimwhitespace(key);
         strcpy(word,key);
         // write(newsockfd, key ,256);
         bzero(key,256);
         bzero(word1,256);
       } else {
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d encrypt\n",userId);
+        fclose(fb);
         strcpy(word,error);
       }
     } else if (strncmp("dec",message,3) == 0) {
@@ -296,11 +312,16 @@ void *connection_handler(void *socket_desc)
           strcpy(key,decrypt(word1));
           clock_t end = clock();
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
           fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
           strcpy(word,key);
           bzero(key,10);
         } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d decrypt\n",userId);
+          fclose(fb);
           strcpy(word,error);
         }
       } else {
@@ -363,10 +384,15 @@ void *connection_handler(void *socket_desc)
             strcat(word,word1);
             strcat(word,",");
             trimwhitespace(word);
-
+            
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
             fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
           } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d reverse\n",userId);
+            fclose(fb);
             strcat(word,job);
             trimwhitespace(word);
             strcat(word,": ");
@@ -392,9 +418,14 @@ void *connection_handler(void *socket_desc)
           trimwhitespace(word);
 
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
           fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
         } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d double\n",userId);
+          fclose(fb);
           strcat(word,job);
           trimwhitespace(word);
           strcat(word,": ");
@@ -456,9 +487,14 @@ void *connection_handler(void *socket_desc)
         trimwhitespace(word);
 
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
           fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
         } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d delete\n",userId);
+          fclose(fb);
           strcat(word,job);
           trimwhitespace(word);
           strcat(word,": ");
@@ -491,8 +527,10 @@ void *connection_handler(void *socket_desc)
           strcpy(key,encrypt(word1,size));
           clock_t end = clock();
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
           fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
           trimwhitespace(key);
           // strcpy(word,key);
           strcat(word,job);
@@ -505,6 +543,9 @@ void *connection_handler(void *socket_desc)
           bzero(key,256);
           bzero(word1,256);
         } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d encrypt\n",userId);
+          fclose(fb);
           strcat(word,job);
           trimwhitespace(word);
           strcat(word,": ");
@@ -522,8 +563,10 @@ void *connection_handler(void *socket_desc)
             strcpy(key,decrypt(word1));
             clock_t end = clock();
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
             fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
 
             strcat(word,job);
             trimwhitespace(word);
@@ -533,6 +576,9 @@ void *connection_handler(void *socket_desc)
             trimwhitespace(word);
             bzero(key,10);
           } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d decrypt\n",userId);
+            fclose(fb);
             strcat(word,job);
             trimwhitespace(word);
             strcat(word,": ");
@@ -550,9 +596,7 @@ void *connection_handler(void *socket_desc)
       bzero(word,256);
     }
 
-
     bzero(buffer,256);
-    fclose(fp);
   }
 
   if(read_size == 0)

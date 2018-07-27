@@ -1,5 +1,5 @@
 <?php
-  $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
+  $con = mysqli_connect("localhost","benjie","n0p@55w0RD","stringServer");
   $query = "SELECT * FROM processed_jobs";
   $data = mysqli_query($con, $query);
 
@@ -9,8 +9,26 @@
 
   $values = array_count_values($arr);
   arsort($values);
-  $popular = array_slice(array_keys($values),0,10,true);
-  echo $values[1];
+  $popular_with_count = array_slice($values,0,10,true);
+  $popular = array_keys($popular_with_count);
+  $popular_count = array_values($popular_with_count);
+
+  foreach($popular as $i) {
+    $query1 = "SELECT * FROM blacklist WHERE userId = $i";
+    $data1 = mysqli_query($con,$query1);
+    $failedcount[] = mysqli_num_rows($data1); 
+  }
+
+  // foreach($failedcount as $i)
+  // {
+  //   echo $i." ";
+  // }
+
+  for($i=0;$i<10;$i++)
+  {
+    $average[] = $popular_count[$i]/($failedcount[$i]+$popular_count[$i])*100;
+  }  
+  
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +62,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -61,7 +79,7 @@
           <a class="nav-link" href="waitingjobs.html">Waiting Jobs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="waitingjobs.html">Ready Jobs</a>
+          <a class="nav-link" href="ready_jobs.php">Ready Jobs</a>
         </li>
       </ul>
 
@@ -76,7 +94,9 @@
             <tr>
               <th scope="col">#</th>
               <th scope="col">Student Id</th>
-              <th scope="col">Percentage rate</th>
+              <th scope="col">Successes</th>
+              <th scope="col">Failures</th>
+              <th scope="col">Percentage</th>
             </tr>
           </thead>
           <tbody>
@@ -84,58 +104,75 @@
             echo '
             <tr>
               <th scope="row">1</th>
-              <td>'.$arr[0].'</td>
-              <td>#</td>
+              <td>'.$popular[0].'</td>
+              <td>'.$popular_count[0].'</td>
+              <td>'.$failedcount[0].'</td>
+              <td>'.round($average[0]).'%</td>
             </tr>
             <tr>
               <th scope="row">2</th>
-              <td>'.$arr[1].'</td>
-              <td>#</td>
+              <td>'.$popular[1].'</td>
+              <td>'.$popular_count[1].'</td>
+              <td>'.$failedcount[1].'</td>
+              <td>'.round($average[1]).'%</td>
             </tr>
             <tr>
               <th scope="row">3</th>
               <td>'.$arr[2].'</td>
-              <td>#</td>
+              <td>'.$popular_count[2].'</td>
+              <td>'.$failedcount[2].'</td>
+              <td>'.round($average[2]).'%</td>
             </tr>
             <tr>
               <th scope="row">4</th>
-              <td>'.$arr[3].'</td>
-              <td>#</td>
+              <td>'.$popular[3].'</td>
+              <td>'.$popular_count[3].'</td>
+              <td>'.$failedcount[3].'</td>
+              <td>'.round($average[3]).'%</td>
             </tr>
             <tr>
               <th scope="row">5</th>
-              <td>'.$arr[4].'</td>
-              <td>#</td>
+              <td>'.$popular[4].'</td>
+              <td>'.$popular_count[4].'</td>
+              <td>'.$failedcount[4].'</td>
+              <td>'.round($average[4]).'%</td>
             </tr>
             <tr>
               <th scope="row">6</th>
-              <td>'.$arr[5].'</td>
-              <td>#</td>
+              <td>'.$popular[5].'</td>
+              <td>'.$popular_count[5].'</td>
+              <td>'.$failedcount[5].'</td>
+              <td>'.round($average[5]).'%</td>
             </tr>
             <tr>
               <th scope="row">7</th>
-              <td>'.$arr[6].'</td>
-              <td>#</td>
+              <td>'.$popular[6].'</td>
+              <td>'.$popular_count[6].'</td>
+              <td>'.$failedcount[6].'</td>
+              <td>'.round($average[6]).'%</td>
             </tr>
             <tr>
               <th scope="row">8</th>
-              <td>'.$arr[7].'</td>
-              <td>#</td>
+              <td>'.$popular[7].'</td>
+              <td>'.$popular_count[7].'</td>
+              <td>'.$failedcount[7].'</td>
+              <td>'.round($average[7]).'%</td>
             </tr>
             <tr>
               <th scope="row">9</th>
-              <td>'.$arr[8].'</td>
-              <td>#</td>
+              <td>'.$popular[8].'</td>
+              <td>'.$popular_count[8].'</td>
+              <td>'.$failedcount[8].'</td>
+              <td>'.round(average[8]).'%</td>
             </tr>
             <tr>
               <th scope="row">10</th>
-              <td>'.$arr[9].'</td>
-              <td>#</td>
+              <td>'.$popular[9].'</td>
+              <td>'.$popular_count[9].'</td>
+              <td>'.$failedcount[9].'</td>
+              <td>'.round($average[9]).'%</td>
             </tr>';
             ?>
-
-
-
           </tbody>
         </table>
         <canvas id="doughnutChart"></canvas>
@@ -222,13 +259,13 @@ var ctxD = document.getElementById("doughnutChart").getContext('2d');
 var myLineChart = new Chart(ctxD, {
 type: 'doughnut',
 data: {
-    labels: ["<?php echo $arr[0]?>", "<?php echo $arr[1]?>", "<?php echo $arr[2]?>",
-    "<?php echo $arr[3]?>", "<?php echo $arr[4]?>","<?php echo $arr[5]?>"],
+    labels: ["<?php echo $popular[0]?>", "<?php echo $popular[1]?>", "<?php echo $popular[2]?>",
+    "<?php echo $popular[3]?>", "<?php echo $popular[4]?>","<?php echo $popular[5]?>","<?php echo $popular[6]?>","<?php echo $popular[7]?>","<?php echo $popular[8]?>","<?php echo $popular[9]?>"],
     datasets: [
         {
-            data: [300, 250, 200, 150, 100, 50],
-            backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360","#FFFFFF"],
-            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#A8B3C5", "#616774","#F0FFF0"]
+            data: [<?php echo $popular_count[0] ?>, <?php echo $popular_count[1] ?>, <?php echo $popular_count[2] ?>,<?php echo $popular_count[3] ?>, <?php echo $popular_count[4] ?>,<?php echo $popular_count[5] ?>,<?php echo $popular_count[6] ?>,<?php echo $popular_count[7] ?>,<?php echo $popular_count[8] ?>,<?php echo $popular_count[9] ?>],
+            backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360","#FFFFFF","#800000","#7fff00","#20b2aa","#ffe4e1"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#A8B3C5", "#616774","#F0FFF0","#a52a2a","#adff2f","#00ced1","#fff0f5"]
         }
     ]
 },
