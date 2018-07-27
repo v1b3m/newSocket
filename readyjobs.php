@@ -13,7 +13,7 @@
   }
   echo "Connected successfully<br/>";
 
-  $myfile = fopen('/var/www/html/stringServer/ready_jobs.txt','r+') or die ('Unable to open file');
+  $myfile = fopen('/var/www/html/stringServer/ready_jobs.txt','r+') or die ('Unable to open readyjobs');
 
   //output one line until end-of-file
   while(!feof($myfile)) {
@@ -30,8 +30,28 @@
     }
   }
 
-
-  mysqli_close($conn);
   ftruncate($myfile,0);
   fclose($myfile);
+
+  $blacklist = fopen('/var/www/html/stringServer/blacklist.txt','r+') or die ('Unable to open blacklist');
+  //output one line until end-of-file
+  while(!feof($blacklist)) {
+    $data = fgets($blacklist);
+    $datum = explode(",",$data);
+
+    $sql = "INSERT INTO blacklist VALUES (0,$datum[0],'$datum[1]')";
+
+    //query the database
+    if (mysqli_query($conn, $sql)) {
+    echo "New record created successfully<br/>";
+    } else {
+      echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    }
+  }
+
+
+  mysqli_close($conn);
+  ftruncate($blacklist,0);
+  fclose($blacklist);
+
 ?>

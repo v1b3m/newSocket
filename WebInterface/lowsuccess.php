@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
   $con = mysqli_connect("localhost","root","n0p@55w0RD","stringServer");
   $query = "SELECT * FROM processed_jobs";
   $data = mysqli_query($con, $query);
@@ -11,6 +12,38 @@
   arsort($values);
   $popular = array_slice(array_keys($values),0,10,true);
   echo $values[1];
+=======
+ $con = mysqli_connect("localhost","benjie","n0p@55w0RD","stringServer");
+ $query = "SELECT * FROM blacklist";
+ $data = mysqli_query($con, $query);
+
+ while($row = mysqli_fetch_array($data)){
+   $arr[] = $row['userId'];
+ }
+
+ $values = array_count_values($arr);
+ arsort($values);
+ $popular_with_count = array_slice($values,0,10,true);
+ $popular = array_keys($popular_with_count);
+ $popular_count = array_values($popular_with_count);
+
+ foreach($popular as $i) {
+   $query1 = "SELECT * FROM processed_jobs WHERE user_id = $i";
+   $data1 = mysqli_query($con,$query1);
+   $success_count[] = mysqli_num_rows($data1); 
+ }
+
+//  foreach($failedcount as $i)
+//  {
+//    echo $i." ";
+//  }
+
+ for($i=0;$i<10;$i++)
+ {
+   $average[] = $popular_count[$i]/($success_count[$i]+$popular_count[$i])*100;
+ }  
+ 
+>>>>>>> trial
 ?>
 
 <!DOCTYPE html>
@@ -51,8 +84,8 @@
             Job ratings
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="highsuccess.html">Highest success rate</a>
-            <a class="dropdown-item" href="lowsuccess.html">Lowest success rate</a>
+            <a class="dropdown-item" href="highsuccess.php">Highest success rate</a>
+            <a class="dropdown-item" href="lowsuccess.php">Lowest success rate</a>
             <!-- <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Something else here</a> -->
           </div>
@@ -76,10 +109,13 @@
             <tr>
               <th scope="col">#</th>
               <th scope="col">Student Job</th>
-              <th scope="col">Percentage Rate</th>
+              <th scope="col">Failures</th>
+              <th scope="col">Successes</th>
+              <th scope="col">Percentage</th>
             </tr>
           </thead>
           <tbody>
+<<<<<<< HEAD
           <?php
             echo '
             <tr>
@@ -91,10 +127,28 @@
               <th scope="row">2</th>
               <td>'.$arr[1].'</td>
               <td>#</td>
+=======
+            <?php
+            echo '
+            <tr>
+              <th scope="row">1</th>
+              <td>'.$popular[0].'</td>
+              <td>'.$popular_count[0].'</td>
+              <td>'.$success_count[0].'</td>
+              <td>'.round($average[0]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>'.$popular[1].'</td>
+              <td>'.$popular_count[1].'</td>
+              <td>'.$success_count[1].'</td>
+              <td>'.round($average[1]).'%</td>
+>>>>>>> trial
             </tr>
             <tr>
               <th scope="row">3</th>
               <td>'.$arr[2].'</td>
+<<<<<<< HEAD
               <td>#</td>
             </tr>
             <tr>
@@ -133,6 +187,63 @@
               <td>#</td>
             </tr>';
             ?>   
+=======
+              <td>'.$popular_count[2].'</td>
+              <td>'.$success_count[2].'</td>
+              <td>'.round($average[2]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">4</th>
+              <td>'.$popular[3].'</td>
+              <td>'.$popular_count[3].'</td>
+              <td>'.$success_count[3].'</td>
+              <td>'.round($average[3]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">5</th>
+              <td>'.$popular[4].'</td>
+              <td>'.$popular_count[4].'</td>
+              <td>'.$success_count[4].'</td>
+              <td>'.round($average[4]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">6</th>
+              <td>'.$popular[5].'</td>
+              <td>'.$popular_count[5].'</td>
+              <td>'.$success_count[5].'</td>
+              <td>'.round($average[5]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">7</th>
+              <td>'.$popular[6].'</td>
+              <td>'.$popular_count[6].'</td>
+              <td>'.$success_count[6].'</td>
+              <td>'.round($average[6]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">8</th>
+              <td>'.$popular[7].'</td>
+              <td>'.$popular_count[7].'</td>
+              <td>'.$success_count[7].'</td>
+              <td>'.round($average[7]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">9</th>
+              <td>'.$popular[8].'</td>
+              <td>'.$popular_count[8].'</td>
+              <td>'.$success_count[8].'</td>
+              <td>'.round(average[8]).'%</td>
+            </tr>
+            <tr>
+              <th scope="row">10</th>
+              <td>'.$popular[9].'</td>
+              <td>'.$popular_count[9].'</td>
+              <td>'.$success_count[9].'</td>
+              <td>'.round($average[9]).'%</td>
+            </tr>';
+            ?>
+          </tbody>      
+>>>>>>> trial
         </table>
         <canvas id="doughnutChart"></canvas>
     </div>
