@@ -109,6 +109,7 @@ void *connection_handler(void *socket_desc)
 {
   int sock = *(int*)socket_desc;
   int read_size;
+  srand(time(NULL));
   int userId = rand();
   char buffer[256];
   char word[256];
@@ -151,33 +152,40 @@ void *connection_handler(void *socket_desc)
       if(strncmp("rev",message,3) == 0)
       {
         word1 = strtok(NULL," ");
-        if (strlen(word1) <= 50 )
-        {
-        clock_t begin = clock();
-        
-        int i, j, temp;
-        int l = strlen(word1);
+        if(word1 != NULL) {
+          if (strlen(word1) <= 50 )
+          {
+          clock_t begin = clock();
+          
+          int i, j, temp;
+          int l = strlen(word1);
 
 
-          for (i = 0, j = l - 1; i < j; i++, j--) {
-          temp = word1[i];
-          word1[i] = word1[j];
-          word1[j] = temp;
+            for (i = 0, j = l - 1; i < j; i++, j--) {
+            temp = word1[i];
+            word1[i] = word1[j];
+            word1[j] = temp;
+            }
+            word1 = trimwhitespace(word1);
+            clock_t end = clock();
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            strcpy(word,word1);
+
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d reverse\n",userId);
+            fclose(fb);
+            strcpy(word,error);
           }
-          word1 = trimwhitespace(word1);
-          clock_t end = clock();
-          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-          strcpy(word,word1);
-
-          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-          fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          fclose(fp);
         } else {
           fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
           fprintf(fb,"%d reverse\n",userId);
           fclose(fb);
-          strcpy(word,error);
+          strcpy(word,"Please Enter a word to reverse");
         }
 
       } else if (strncmp("dbl",message,3) == 0)
@@ -187,146 +195,194 @@ void *connection_handler(void *socket_desc)
         clock_t begin = clock();
         // int userId = rand();
         job = strtok(NULL," ");
-        if(strlen(job) <= 50 ) {
-        dbl(job);
-        clock_t end = clock();
-        strcpy(word,job);
+        if(job != NULL) {
+          if(strlen(job) <= 50 ) {
+          dbl(job);
+          clock_t end = clock();
+          strcpy(word,job);
 
-        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-        fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-        fclose(fp);
-      } else {
-        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-        fprintf(fb,"%d double\n",userId);
-        fclose(fb);
-        strcpy(word,error);
-      }
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+          fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+          fclose(fp);
+          } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d double\n",userId);
+          fclose(fb);
+          strcpy(word,error);
+          }
+        } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d double\n",userId);
+          fclose(fb);
+          strcpy(word,"Please enter a word to double.");
+        }
 
       } else if (strncmp("del",message,3) == 0)
       {
         word1 = strtok(NULL," ");
-        if (strlen(word1) <= 50)
+        if(word1 != NULL)
         {
-        clock_t begin = clock();
-        // int userId = rand();
-        // char word[50];
-        char numbers[20];
+          char * numbers;
+          numbers = strtok(NULL," ");
 
-        //initialize array to hold the indexes to be deleted
-        int num[10]={0};
+          if(numbers != NULL) {
+
+            if (strlen(word1) <= 50)
+            {
+            clock_t begin = clock();
+            // int userId = rand();
+            // char word[50];
+            // char numbers[20];
+
+            //initialize array to hold the indexes to be deleted
+            int num[10]={0};
 
 
-        strcpy(numbers,strtok(NULL," "));
+            // strcpy(numbers,strtok(NULL," "));
+            
+            int n = strlen(numbers);
 
-        int n = strlen(numbers);
+            num[0] = atoi(strtok(numbers,","));
 
-        num[0] = atoi(strtok(numbers,","));
+            for(int i=1;i<(n/2);i++) {
+              num[i] = atoi(strtok(NULL,","));
+            }
 
-        for(int i=1;i<(n/2);i++) {
-          num[i] = atoi(strtok(NULL,","));
+              // sort the array in ascending order
+            for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
+            {
+              for (int j = 0; j < 10; j++)             //Loop for comparing other values
+              {
+                if (num[j] > num[i])                //Comparing other array elements
+                {
+                  int tmp = num[i];         //Using temporary variable for storing last value
+                  num[i] = num[j];            //replacing value
+                  num[j] = tmp;             //storing last value
+                }
+              }
+            }
+
+            int j=1;
+            for(int i=0;i<10;i++){
+              if(num[i] != 0) {
+                del(word1,num[i]-j);
+                j++;
+              }
+            }
+            clock_t end = clock();
+            strcpy(word,word1);
+
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+            fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
+            } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d delete\n",userId);
+            fclose(fb);
+            strcpy(word,"I'm feeling lazy today so please enter a word that's 50 characters or less...");
+            }
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d delete\n",userId);
+            fclose(fb); 
+            strcpy(word,"Please indicate the positions of the characters to be deleted.");
+          }
+          
+        } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d delete\n",userId);
+          fclose(fb);
+          strcpy(word,"Please enter a word from which to delete characters.");
         }
-
-        // sort the array in ascending order
-        for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
-        {
-        	for (int j = 0; j < 10; j++)             //Loop for comparing other values
-        	{
-        		if (num[j] > num[i])                //Comparing other array elements
-        		{
-        			int tmp = num[i];         //Using temporary variable for storing last value
-        			num[i] = num[j];            //replacing value
-        			num[j] = tmp;             //storing last value
-        		}
-        	}
-        }
-
-      int j=1;
-      for(int i=0;i<10;i++){
-        if(num[i] != 0) {
-          del(word1,num[i]-j);
-          j++;
-        }
-      }
-      clock_t end = clock();
-      strcpy(word,word1);
-
-        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-        fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-        fclose(fp);
-      } else {
-        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-        fprintf(fb,"%d delete\n",userId);
-        fclose(fb);
-        strcpy(word,error);
-      }
 
       } else if (strncmp("rep",message,3) == 0)
       {
         //some wrork to be done here
-        char * message = "Unfortunately, we're unable to process this request at the moment!";
-        strcpy(word,message);
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d replace\n",userId);
+        fclose(fb);
+        strcpy(word,"Unfortunately, we're unable to process this request at the moment!");
 
       } else if (strncmp("enc",message,3) == 0) {
-        char word1[256];
-        strcpy(word1,strtok(NULL," "));
-        if (strlen(word1) <= 50)
+        char *word1;
+        word1 = strtok(NULL," ");
+        if(word1 != NULL)
         {
-        clock_t begin = clock();
-        // int userId = rand();
-
-        char key[256];
-
-        trimwhitespace(word1);
-        int size = strlen(word1);
-        strcpy(key,encrypt(word1,size));
-        clock_t end = clock();
-        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-        fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-        tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-        fclose(fp);
-        trimwhitespace(key);
-        strcpy(word,key);
-        // write(newsockfd, key ,256);
-        bzero(key,256);
-        bzero(word1,256);
-      } else {
-        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-        fprintf(fb,"%d encrypt\n",userId);
-        fclose(fb);
-        strcpy(word,error);
-      }
-    } else if (strncmp("dec",message,3) == 0) {
-        char word1[50];
-        strcpy(word1,strtok(NULL," "));
-        if (strlen(word1) <= 50) {
+          if (strlen(word1) <= 50)
+          {
           clock_t begin = clock();
           // int userId = rand();
 
-          char key[10];
+          char key[256];
+
           trimwhitespace(word1);
-          strcpy(key,decrypt(word1));
+          int size = strlen(word1);
+          strcpy(key,encrypt(word1,size));
           clock_t end = clock();
           double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
           fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-          fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+          fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
           tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
           fclose(fp);
+          trimwhitespace(key);
           strcpy(word,key);
-          bzero(key,10);
+          // write(newsockfd, key ,256);
+          bzero(key,256);
+          bzero(word1,256);
         } else {
           fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-          fprintf(fb,"%d decrypt\n",userId);
+          fprintf(fb,"%d encrypt\n",userId);
           fclose(fb);
           strcpy(word,error);
         }
       } else {
-        char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
-        strcpy(word,message);
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d encrypt\n",userId);
+        fclose(fb);
+        strcpy(word,"Please enter a word to encrypt.");
+      }
+    } else if (strncmp("dec",message,3) == 0) {
+        char* word1;
+        word1 = strtok(NULL," ");
+        if(word1 != NULL)
+        {
+          if (strlen(word1) <= 50) 
+          {
+            clock_t begin = clock();
+            // int userId = rand();
+
+            char key[10];
+            trimwhitespace(word1);
+            strcpy(key,decrypt(word1));
+            clock_t end = clock();
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+            fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
+            strcpy(word,key);
+            bzero(key,10);
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d decrypt\n",userId);
+            fclose(fb);
+            strcpy(word,error);
+          }
+        } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d decrypt\n",userId);
+          fclose(fb);
+          strcpy(word,"Please enter a word to decrypt");
+        }
+      } else {
+        fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+        fprintf(fb,"%d unknown\n",userId);
+        fclose(fb);
+        strcpy(word,"One of us has made a mistake and I'm not the one pushing the keys.");
       }
 
       trimwhitespace(word);
@@ -361,34 +417,45 @@ void *connection_handler(void *socket_desc)
         if(strncmp("rev",type,3) == 0)
         {
           word1 = strtok(NULL," ");
-          if (strlen(word1) <= 50 )
-          {
-          clock_t begin = clock();
+          if(word1 != NULL){
+            if (strlen(word1) <= 50 )
+            {
+            clock_t begin = clock();
 
-          int i, j, temp;
-          int l = strlen(word1);
+            int i, j, temp;
+            int l = strlen(word1);
 
 
-            for (i = 0, j = l - 1; i < j; i++, j--) {
-            temp = word1[i];
-            word1[i] = word1[j];
-            word1[j] = temp;
+              for (i = 0, j = l - 1; i < j; i++, j--) {
+              temp = word1[i];
+              word1[i] = word1[j];
+              word1[j] = temp;
+              }
+              word1 = trimwhitespace(word1);
+              clock_t end = clock();
+              double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+              strcat(word,job);
+              trimwhitespace(word);
+              strcat(word,": ");
+              strcat(word,word1);
+              strcat(word,",");
+              trimwhitespace(word);
+              
+              fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+              fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+              tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+              fclose(fp);
+            } else {
+              fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+              fprintf(fb,"%d reverse\n",userId);
+              fclose(fb);
+              strcat(word,job);
+              trimwhitespace(word);
+              strcat(word,": ");
+              strcat(word,error);
+              strcat(word,",");
             }
-            word1 = trimwhitespace(word1);
-            clock_t end = clock();
-            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-
-            strcat(word,job);
-            trimwhitespace(word);
-            strcat(word,": ");
-            strcat(word,word1);
-            strcat(word,",");
-            trimwhitespace(word);
-            
-            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-            fprintf(fp,"%d,reverse,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-            fclose(fp);
           } else {
             fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
             fprintf(fb,"%d reverse\n",userId);
@@ -396,7 +463,7 @@ void *connection_handler(void *socket_desc)
             strcat(word,job);
             trimwhitespace(word);
             strcat(word,": ");
-            strcat(word,error);
+            strcat(word,"Please enter a word to reverse.");
             strcat(word,",");
           }
 
@@ -406,91 +473,129 @@ void *connection_handler(void *socket_desc)
           // strcpy(job,strtok(NULL," "));
           clock_t begin = clock();
           job1 = strtok(NULL," ");
-          if(strlen(job1) <= 50 ) {
-          dbl(job1);
-          clock_t end = clock();
+          if(job1 != NULL)
+          {
+            if(strlen(job1) <= 50 ) {
+            dbl(job1);
+            clock_t end = clock();
 
-          strcat(word,job);
-          trimwhitespace(word);
-          strcat(word,": ");
-          strcat(word,job1);
-          strcat(word,",");
-          trimwhitespace(word);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,job1);
+            strcat(word,",");
+            trimwhitespace(word);
 
-          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-          fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          fclose(fp);
-        } else {
-          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-          fprintf(fb,"%d double\n",userId);
-          fclose(fb);
-          strcat(word,job);
-          trimwhitespace(word);
-          strcat(word,": ");
-          strcat(word,error);
-          strcat(word,",");
-        }
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+            fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+            fprintf(fp,"%d,double,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+            fclose(fp);
+            } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d double\n",userId);
+            fclose(fb);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,error);
+            strcat(word,",");
+            }
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d double\n",userId);
+            fclose(fb);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,"Please enter a word to double");
+            strcat(word,",");
+          }
 
-      } else if (strncmp("del",type,3) == 0)
+        } else if (strncmp("del",type,3) == 0)
         {
           word1 = strtok(NULL," ");
-          if (strlen(word1) <= 50)
-          {
-          clock_t begin = clock();
-          // char word[50];
-          char numbers[20];
+          if(word1 != NULL)
+          { 
+            char * numbers;
+            numbers = strtok(NULL," ");
+            if(numbers != NULL)
+            {
+              if (strlen(word1) <= 50)
+              {
+              clock_t begin = clock();
+              // char word[50];
+              
 
-          //initialize array to hold the indexes to be deleted
-          int num[10]={0};
+              //initialize array to hold the indexes to be deleted
+              int num[10]={0};
 
 
-          strcpy(numbers,strtok(NULL," "));
+              
 
-          int n = strlen(numbers);
+              int n = strlen(numbers);
 
-          num[0] = atoi(strtok(numbers,","));
+              num[0] = atoi(strtok(numbers,","));
 
-          for(int i=1;i<(n/2);i++) {
-            num[i] = atoi(strtok(NULL,","));
-          }
+              for(int i=1;i<(n/2);i++) {
+                num[i] = atoi(strtok(NULL,","));
+              }
 
-          // sort the array in ascending order
-          for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
-          {
-          	for (int j = 0; j < 10; j++)             //Loop for comparing other values
-          	{
-          		if (num[j] > num[i])                //Comparing other array elements
-          		{
-          			int tmp = num[i];         //Using temporary variable for storing last value
-          			num[i] = num[j];            //replacing value
-          			num[j] = tmp;             //storing last value
-          		}
-          	}
-          }
+              // sort the array in ascending order
+              for (int i = 0; i < 10; i++)                     //Loop for ascending ordering
+              {
+                for (int j = 0; j < 10; j++)             //Loop for comparing other values
+                {
+                  if (num[j] > num[i])                //Comparing other array elements
+                  {
+                    int tmp = num[i];         //Using temporary variable for storing last value
+                    num[i] = num[j];            //replacing value
+                    num[j] = tmp;             //storing last value
+                  }
+                }
+              }
 
-        int j=1;
-        for(int i=0;i<10;i++){
-          if(num[i] != 0) {
-            del(word1,num[i]-j);
-            j++;
-          }
-        }
-        clock_t end = clock();
+            int j=1;
+            for(int i=0;i<10;i++){
+              if(num[i] != 0) {
+                del(word1,num[i]-j);
+                j++;
+              }
+            }
+            clock_t end = clock();
 
-        strcat(word,job);
-        trimwhitespace(word);
-        strcat(word,": ");
-        strcat(word,word1);
-        strcat(word,",");
-        trimwhitespace(word);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,word1);
+            strcat(word,",");
+            trimwhitespace(word);
 
-          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-          fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          fclose(fp);
+              double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+              fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+              fprintf(fp,"%d,delete,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+              tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+              fclose(fp);
+            } else {
+              fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+              fprintf(fb,"%d delete\n",userId);
+              fclose(fb);
+              strcat(word,job);
+              trimwhitespace(word);
+              strcat(word,": ");
+              strcat(word,error);
+              strcat(word,",");
+            }
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d delete\n",userId);
+            fclose(fb);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,"Please indicate the positions of the characters you want deleted");
+            strcat(word,",");
+          }  
         } else {
           fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
           fprintf(fb,"%d delete\n",userId);
@@ -498,86 +603,57 @@ void *connection_handler(void *socket_desc)
           strcat(word,job);
           trimwhitespace(word);
           strcat(word,": ");
-          strcat(word,error);
+          strcat(word,"Please enter a word from which to delete characters.");
           strcat(word,",");
         }
 
       } else if (strncmp("rep",type,3) == 0)
         {
           //some wrork to be done here
-          char * message = "Unfortunately, we're unable to process this request at the moment!";
-          strcat(word,job);
-          trimwhitespace(word);
-          strcat(word,": ");
-          strcat(word,message);
-          strcat(word,",");
-          trimwhitespace(word);
-
-        } else if (strncmp("enc",type,3) == 0) {
-          char word1[256];
-          strcpy(word1,strtok(NULL," "));
-          if (strlen(word1) <= 50)
-          {
-          clock_t begin = clock();
-
-          char key[256];
-
-          trimwhitespace(word1);
-          int size = strlen(word1);
-          strcpy(key,encrypt(word1,size));
-          clock_t end = clock();
-          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-          fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-          fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
-          tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
-          fclose(fp);
-          trimwhitespace(key);
-          // strcpy(word,key);
-          strcat(word,job);
-          trimwhitespace(word);
-          strcat(word,": ");
-          strcat(word,key);
-          strcat(word,",");
-          trimwhitespace(word);
-
-          bzero(key,256);
-          bzero(word1,256);
-        } else {
           fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-          fprintf(fb,"%d encrypt\n",userId);
+          fprintf(fb,"%d replace\n",userId);
           fclose(fb);
           strcat(word,job);
           trimwhitespace(word);
           strcat(word,": ");
-          strcat(word,error);
+          strcat(word,"Unfortunately, we're unable to process this request at the moment!");
           strcat(word,",");
-        }
-      } else if (strncmp("dec",type,3) == 0) {
-          char word1[50];
-          strcpy(word1,strtok(NULL," "));
-          if (strlen(word1) <= 50) {
+          trimwhitespace(word);
+
+        } else if (strncmp("enc",type,3) == 0) {
+          char * word1;
+          word1 = strtok(NULL," ");
+          if(word1 != NULL)
+          {
+            if (strlen(word1) <= 50)
+            {
             clock_t begin = clock();
 
-            char key[10];
+            char key[256];
+
             trimwhitespace(word1);
-            strcpy(key,decrypt(word1));
+            int size = strlen(word1);
+            strcpy(key,encrypt(word1,size));
             clock_t end = clock();
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
             fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
-            fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+            fprintf(fp,"%d,encrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
             fclose(fp);
-
+            trimwhitespace(key);
+            // strcpy(word,key);
             strcat(word,job);
             trimwhitespace(word);
             strcat(word,": ");
             strcat(word,key);
             strcat(word,",");
             trimwhitespace(word);
-            bzero(key,10);
+
+            bzero(key,256);
+            bzero(word1,256);
           } else {
             fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
-            fprintf(fb,"%d decrypt\n",userId);
+            fprintf(fb,"%d encrypt\n",userId);
             fclose(fb);
             strcat(word,job);
             trimwhitespace(word);
@@ -586,8 +662,69 @@ void *connection_handler(void *socket_desc)
             strcat(word,",");
           }
         } else {
-          char* message = "One of us has made a mistake and I'm not the one pushing the keys.";
-          strcpy(word,message);
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d encrypt\n",userId);
+          fclose(fb);
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,"Please enter a word to encrypt.");
+          strcat(word,",");
+        } 
+      } else if (strncmp("dec",type,3) == 0) {
+          char* word1;
+          word1 = strtok(NULL," ");
+          if(word1 != NULL)
+          {
+            if (strlen(word1) <= 50) {
+              clock_t begin = clock();
+
+              char key[10];
+              trimwhitespace(word1);
+              strcpy(key,decrypt(word1));
+              clock_t end = clock();
+              double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+              fp = fopen("/var/www/html/stringServer/ready_jobs.txt","a");
+              fprintf(fp,"%d,decrypt,%f,%d-%d-%d %d:%d:%d\n",userId, time_spent,tm.tm_year + 1900,
+              tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,tm.tm_min, tm.tm_sec);
+              fclose(fp);
+
+              strcat(word,job);
+              trimwhitespace(word);
+              strcat(word,": ");
+              strcat(word,key);
+              strcat(word,",");
+              trimwhitespace(word);
+              bzero(key,10);
+            } else {
+              fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+              fprintf(fb,"%d decrypt\n",userId);
+              fclose(fb);
+              strcat(word,job);
+              trimwhitespace(word);
+              strcat(word,": ");
+              strcat(word,error);
+              strcat(word,",");
+            }
+          } else {
+            fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+            fprintf(fb,"%d decrypt\n",userId);
+            fclose(fb);
+            strcat(word,job);
+            trimwhitespace(word);
+            strcat(word,": ");
+            strcat(word,"Please enter a word to decrypt.");
+            strcat(word,",");
+          }
+        } else {
+          fb = fopen("/var/www/html/stringServer/blacklist.txt","a");
+          fprintf(fb,"%d unknown\n",userId);
+          fclose(fb);
+          strcat(word,job);
+          trimwhitespace(word);
+          strcat(word,": ");
+          strcat(word,"One of us has made a mistake and I'm not the one pushing the keys.");
+          strcat(word,",");
         }
 
       }
