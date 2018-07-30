@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     fgets(buffer,255,stdin);
 
     if (buffer[0] == 'q') {
-      puts("It will not be the same without you. It will actually be better");
+      puts("It will not be the same without you. It will actually be better:-)");
       puts("Good Bye");
       close(sockfd);
       return 0;

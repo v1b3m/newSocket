@@ -40,6 +40,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/media-queries.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <title>Home</title>
   <script>
 window.onload = function () {
@@ -72,6 +73,7 @@ chart.render();
 <body>
   <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <img src="favicon.png" alt="" style="width:50px;height:50px;">
     <a class="navbar-brand" href="#">C-String&trade;</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
